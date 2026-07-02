@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบทะเบียนใบลาพนักงาน</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #f4faf7;
+            --glass-card: #ffffff;
+            --glass-border: #e3ede7;
+            --color-primary: #4f7a68;
+            --color-primary-deep: #365d4e;
+            --color-mint: #bfe3d0;
+            --color-mint-soft: #eaf6ef;
+            --text-dark: #33413b;
+            --text-muted: #7c8b84;
+            --error-color: #d97878;
+            --badge-sick-bg: #eaf4f1;
+            --badge-sick-text: #3f6656;
+            --badge-sick-border: #bfe1d3;
+            --badge-personal-bg: #fbf3e7;
+            --badge-personal-text: #ad7f3f;
+            --badge-personal-border: #f0dfbf;
+            --badge-vacation-bg: #f3e8ff;
+            --badge-vacation-text: #6b21a8;
+            --badge-vacation-border: #e9d5ff;
+            --shadow-premium: 0 12px 40px rgba(79, 122, 104, 0.06);
+            --shadow-tooltip: 0 20px 45px rgba(51, 65, 59, 0.14);
+            --radius-main: 20px;
+            --radius-sub: 12px;
+        }
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-canvas);
+            color: var(--text-dark);
+            padding: 36px 20px 60px;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .container { max-width: 1240px; margin: 0 auto; }
+        header {
+            background: linear-gradient(135deg, #3f6656 0%, #4f7a68 100%);
+            border-radius: var(--radius-main);
+            padding: 28px 34px;
+            margin-bottom: 22px;
+            box-shadow: var(--shadow-premium);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            color: #eef7f1;
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            width: 260px; height: 260px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            top: -110px; right: -60px;
+        }
+        .header-title-block { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+        .header-title-block .leaf-icon { width: 30px; height: 30px; flex-shrink: 0; }
+        header h1 { font-size: 21px; font-weight: 700; letter-spacing: -0.2px; }
+        header p { font-size: 12.5px; opacity: 0.8; margin-top: 3px; font-weight: 300; }
+        .header-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: relative; z-index: 1; }
+        .user-profile-badge {
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.22);
+            padding: 8px 16px 8px 8px;
+            border-radius: 50px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: var(--color-mint);
+            color: var(--color-primary-deep);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12.5px; font-weight: 700;
+            flex-shrink: 0;
+        }
+        .icon-btn {
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.22);
+            color: #ffffff;
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: rgba(255,255,255,0.26); }
+        .icon-btn svg { width: 17px; height: 17px; }
+        .btn-modern-primary {
+            background: #ffffff;
+            color: var(--color-primary-deep);
+            border: none;
+            padding: 12px 22px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border-radius: var(--radius-sub);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn-modern-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+        .stat-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-main);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-premium);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .stat-icon {
+            width: 46px; height: 46px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .stat-icon.total { background: var(--color-mint-soft); }
+        .stat-icon.sick { background: var(--badge-sick-bg); }
+        .stat-icon.personal { background: var(--badge-personal-bg); }
+        .stat-icon.vacation { background: var(--badge-vacation-bg); }
+        .stat-value { font-size: 22px; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
+        .stat-label { font-size: 12.5px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+        
+        .glass-panel {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-main);
+            padding: 32px 34px;
+            margin-bottom: 22px;
+            box-shadow: var(--shadow-premium);
+        }
+        .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 14px; }
+        .glass-panel h2 {
+            font-size: 16.5px;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .glass-panel h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px; height: 17px;
+            background: var(--color-primary);
+            border-radius: 4px;
+        }
+        .reg-counter-card {
+            background: var(--color-mint-soft);
+            border: 1px solid var(--glass-border);
+            padding: 9px 16px;
+            border-radius: var(--radius-sub);
+            font-size: 12.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-primary-deep);
+        }
+        .reg-counter-card input {
+            width: 46px;
+            border: none;
+            background: transparent;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--color-primary-deep);
+            outline: none;
+            text-align: center;
+        }
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .form-group.span-2 { grid-column: span 2; }
+        .form-group.span-4 { grid-column: span 4; }
+        .form-group label { font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 7px; display: block; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1.5px solid var(--glass-border);
+            border-radius: 10px;
+            font-size: 14.5px;
+            color: var(--text-dark);
+            background: #fbfdfc;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .form-group input:focus, .form-group select:focus {
+            background: #ffffff;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 4px rgba(79, 122, 104, 0.08);
+        }
+        .form-group input.duplicate-error { border-color: var(--error-color) !important; background-color: #fdf4f4 !important; color: var(--error-color); }
+        .error-msg-text { color: var(--error-color); font-size: 12px; margin-top: 5px; display: none; }
+        .checkbox-row {
+            display: flex; align-items: center; gap: 9px; cursor: pointer;
+            margin-top: 38px; font-size: 13.5px; font-weight: 600; color: var(--text-dark);
+        }
+        .checkbox-row input { width: 18px; height: 18px; accent-color: var(--color-primary); }
+        .form-actions-wrapper { display: flex; justify-content: flex-end; gap: 12px; margin-top: 6px; }
+        .btn-modern-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1.5px solid var(--glass-border);
+            padding: 12px 22px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border-radius: var(--radius-sub);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-modern-ghost:hover { background: var(--color-mint-soft); color: var(--text-dark); }
+        .btn-solid-primary {
+            background: var(--color-primary);
+            color: #ffffff;
+            border: none;
+            padding: 12px 26px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border-radius: var(--radius-sub);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-solid-primary:hover { background: var(--color-primary-deep); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(79,122,104,0.2); }
+        .btn-solid-primary:disabled { background: #cddcd4; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .name-input-group { display: flex; gap: 10px; width: 100%; }
+        .name-prefix-select { width: 135px !important; flex-shrink: 0; }
+        .custom-prefix-input { width: 110px !important; flex-shrink: 0; display: none; }
+        .name-fullname-input { flex-grow: 1; }
+
+        .table-responsive-box { width: 100%; overflow-x: visible; border-radius: var(--radius-sub); border: 1px solid var(--glass-border); }
+        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 1000px; background: #ffffff; }
+        th {
+            padding: 16px 16px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: #f7faf8;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        tbody tr { border-bottom: 1px solid #f0f5f1; transition: background-color 0.15s; }
+        tbody tr:hover { background-color: #f9fcfa; }
+        tbody td { padding: 16px; font-size: 13.5px; color: var(--text-dark); vertical-align: middle; }
+        tbody td.cell-reg { font-weight: 700; color: var(--color-primary-deep); }
+        
+        .badge-type { display: inline-block; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; text-align: center; white-space: nowrap; }
+        .badge-sick { background: var(--badge-sick-bg); color: var(--badge-sick-text); border: 1px solid var(--badge-sick-border); }
+        .badge-personal { background: var(--badge-personal-bg); color: var(--badge-personal-text); border: 1px solid var(--badge-personal-border); }
+        .badge-vacation { background: var(--badge-vacation-bg); color: var(--badge-vacation-text); border: 1px solid var(--badge-vacation-border); }
+        
+        .badge-dept { display: inline-block; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; min-width: 58px; text-align: center; }
+        .dept-sok { background: #fdf2f2; color: #ec5b5b; border: 1px solid #fbc4c4; }
+        .dept-swv { background: #eef7fc; color: #3b9cd9; border: 1px solid #c2e1f5; }
+        .dept-swp { background: #eaf8f0; color: #2ebd6e; border: 1px solid #bcead0; }
+        .dept-swl { background: #fffcf0; color: #cca010; border: 1px solid #fef0b3; }
+        .dept-sst { background: #faf0fd; color: #a85dd4; border: 1px solid #ebd2f8; }
+        .action-link { background: none; border: none; color: var(--color-primary); font-size: 13px; font-weight: 600; cursor: pointer; }
+        .action-link:hover { color: var(--color-primary-deep); text-decoration: underline; }
+        
+        .history-container { position: relative; display: inline-block; margin-top: 6px; }
+        .history-trigger-text {
+            font-size: 11.5px; color: var(--text-muted); cursor: pointer;
+            text-decoration: underline dotted; display: inline-block;
+        }
+        .history-tooltip-box {
+            display: none;
+            position: absolute;
+            right: 10px; top: 24px;
+            background: #ffffff;
+            color: var(--text-dark);
+            padding: 20px;
+            border-radius: var(--radius-sub);
+            width: 380px;
+            box-shadow: var(--shadow-tooltip);
+            border: 1px solid var(--glass-border);
+            z-index: 99999 !important;
+            text-align: left;
+            animation: floatingFade 0.2s ease-out;
+        }
+        @keyframes floatingFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .history-container:hover .history-tooltip-box { display: block; }
+        .history-header {
+            font-size: 14.5px; font-weight: 700; color: var(--color-primary-deep);
+            margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px dashed var(--glass-border);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .history-timeline-flow { max-height: 250px; overflow-y: auto; padding-right: 4px; }
+        .history-card-item { position: relative; padding-left: 20px; margin-bottom: 16px; border-left: 2px solid var(--glass-border); }
+        .history-card-item:last-child { margin-bottom: 0; border-left: 2px solid transparent; }
+        .history-card-item::before {
+            content: ''; position: absolute; left: -6px; top: 4px; width: 10px; height: 10px;
+            background: var(--color-mint); border-radius: 50%; border: 2px solid #ffffff;
+        }
+        .history-card-title { font-weight: 700; font-size: 12.5px; color: var(--text-dark); }
+        .history-card-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+        .history-card-meta b { color: var(--color-primary-deep); }
+        .history-change-log { background: #f4faf7; padding: 6px 10px; border-radius: 6px; margin-top: 6px; font-size: 11.5px; border: 1px solid #e3ede7; }
+        .history-change-item { margin-bottom: 4px; }
+        .history-change-item:last-child { margin-bottom: 0; }
+        
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(51, 65, 59, 0.28);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; z-index: 10000; padding: 15px;
+        }
+        .modal-card {
+            background: #ffffff; padding: 32px; border-radius: var(--radius-main); width: 100%;
+            max-width: 500px; box-shadow: 0 25px 55px rgba(0,0,0,0.14); border: 1px solid var(--glass-border);
+        }
+        .modal-card h3 { font-size: 18.5px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+        .modal-card p { color: var(--text-muted); font-size: 13.5px; margin-bottom: 22px; }
+        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        
+        @media (max-width: 1024px) {
+            .stat-row { grid-template-columns: repeat(2, 1fr); }
+            .form-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-group.span-2, .form-group.span-4 { grid-column: span 2; }
+            .table-responsive-box { overflow-x: auto; }
+        }
+        @media (max-width: 640px) {
+            body { padding: 20px 12px 50px; }
+            header { padding: 22px; text-align: center; justify-content: center; flex-direction: column; }
+            .header-title-block { flex-direction: column; text-align: center; }
+            .header-controls { justify-content: center; width: 100%; }
+            .stat-row { grid-template-columns: 1fr; }
+            .glass-panel { padding: 22px; }
+            .form-grid { grid-template-columns: 1fr; gap: 16px; }
+            .form-group.span-2, .form-group.span-4 { grid-column: span 1; }
+            .name-input-group { flex-direction: column; gap: 10px; }
+            .name-prefix-select, .custom-prefix-input { width: 100% !important; }
+            .form-actions-wrapper { flex-direction: column-reverse; width: 100%; gap: 10px; }
+            .form-actions-wrapper button { width: 100%; padding: 14px; }
+            .history-tooltip-box { position: fixed; left: 20px; right: 20px; width: auto; top: 50% !important; transform: translateY(50%); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-title-block">
+            <svg class="leaf-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 38C10 24 18 12 38 10C38 30 26 38 12 38C11 38 10 38 10 38Z" fill="#eef7f1" fill-opacity="0.92"/>
+                <path d="M12 36C18 26 24 20 36 12" stroke="#3f6656" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <div>
+                <h1>ระบบทะเบียนใบลาพนักงาน</h1>
+                <p>ฝ่ายการเจ้าหน้าที่ · ส่วนอำนวยการ สวพ.</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <button class="btn-modern-primary" onclick="openRangeModal()">พิมพ์รายงานสรุป</button>
+            <div class="reg-counter-card">
+                <span>ทะเบียนถัดไป:</span>
+                <input type="number" id="global-next-reg" value="1" onchange="syncRegNumber()">
+            </div>
+            <div class="user-profile-badge">
+                <span class="user-avatar" id="user-avatar-initial">·</span>
+                <span id="current-user-display">กำลังดึงข้อมูลชื่อ...</span>
+            </div>
+            <button class="icon-btn" onclick="logoutUser()" title="ออกจากระบบ" aria-label="ออกจากระบบ">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+        </div>
+    </header>
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="stat-icon total">📁</div>
+            <div>
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-label">ทะเบียนทั้งหมด</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon sick">📁</div>
+            <div>
+                <div class="stat-value" id="stat-sick">0</div>
+                <div class="stat-label">รายการลาป่วย</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon personal">📁</div>
+            <div>
+                <div class="stat-value" id="stat-personal">0</div>
+                <div class="stat-label">รายการลากิจ</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon vacation">📁</div>
+            <div>
+                <div class="stat-value" id="stat-vacation">0</div>
+                <div class="stat-label">รายการลาพักผ่อน</div>
+            </div>
+        </div>
+    </div>
+    <div class="glass-panel">
+        <div class="panel-head">
+            <h2 id="form-heading-title">บันทึกข้อมูลใบลาฉบับใหม่</h2>
+        </div>
+        <form id="leaveDataForm">
+            <input type="hidden" id="active-edit-row-id" value="">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="input-reg-num">เลขทะเบียนรับ</label>
+                    <input type="number" id="input-reg-num" required oninput="validateDuplicateReg()">
+                    <div class="error-msg-text" id="reg-error-msg">เลขทะเบียนนี้ถูกใช้งานไปแล้ว</div>
+                </div>
+                <div class="form-group">
+                    <label for="input-doc-date">ลงวันที่รายงาน</label>
+                    <input type="date" id="input-doc-date" required>
+                </div>
+                <div class="form-group span-2">
+                    <label for="input-emp-name">จาก (ชื่อพนักงาน)</label>
+                    <div class="name-input-group">
+                        <select id="input-emp-prefix" class="name-prefix-select" required onchange="handlePrefixChange()">
+                            <option value="นาย" selected>นาย</option>
+                            <option value="นางสาว">นางสาว</option>
+                            <option value="นาง">นาง</option>
+                            <option value="ว่าที่ร้อยตรีหญิง">ว่าที่ร้อยตรีหญิง</option>
+                            <option value="CUSTOM_OTHER">อื่นๆ (ระบุเอง)</option>
+                        </select>
+                        <input type="text" id="input-custom-prefix" class="custom-prefix-input" placeholder="ระบุเอง...">
+                        <input type="text" id="input-emp-name" class="name-fullname-input" list="emp-datalist" required placeholder="พิมพ์ชื่อ-นามสกุลพนักงาน...">
+                    </div>
+                    <datalist id="emp-datalist"></datalist>
+                </div>
+                <div class="form-group">
+                    <label for="input-sup-name">ถึง (ผู้รับรายงาน)</label>
+                    <input type="text" id="input-sup-name" value="ผอ.สวพ" readonly style="background:#f4f7f5; color:var(--text-muted); cursor:not-allowed;">
+                </div>
+                <div class="form-group">
+                    <label for="input-leave-type">ประเภทการลา</label>
+                    <select id="input-leave-type" required>
+                        <option value="ลาป่วย">ลาป่วย</option>
+                        <option value="ลากิจ">ลากิจ</option>
+                        <option value="ลาพักผ่อน">ลาพักผ่อน</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="input-start-date">เริ่มต้นตั้งแต่วันที่</label>
+                    <input type="date" id="input-start-date" required class="form-date-calc" onchange="execDaysCalc()">
+                </div>
+                <div class="form-group">
+                    <label for="input-end-date">สิ้นสุดถึงวันที่</label>
+                    <input type="date" id="input-end-date" required class="form-date-calc" onchange="execDaysCalc()">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-row" style="margin-bottom:0;">
+                        <input type="checkbox" id="check-half-day" onchange="toggleHalfDayMenu()">
+                        <span>ยื่นขอลาครึ่งวัน</span>
+                    </label>
+                </div>
+                <div class="form-group" id="menu-half-day-time" style="display: none;">
+                    <label for="select-half-time">ระบุช่วงเวลาครึ่งวัน</label>
+                    <select id="select-half-time" onchange="execDaysCalc()">
+                        <option value="08.30 - 12.00 น.">08.30 - 12.00 น.</option>
+                        <option value="13.00 - 16.30 น.">13.00 - 16.30 น.</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="input-total-days">รวมจำนวนวันลา</label>
+                    <input type="text" id="input-total-days" readonly value="0 วัน" style="font-weight:700; color:var(--color-primary-deep); background:#f4f7f5;">
+                </div>
+                <div class="form-group">
+                    <label for="input-action-dept">หน่วยงานปฏิบัติการ</label>
+                    <select id="input-action-dept" required>
+                        <option value="สอก">สอก.</option>
+                        <option value="สวว">สวว.</option>
+                        <option value="สวป">สวป.</option>
+                        <option value="สวล">สวล.</option>
+                        <option value="สสท">สสท.</option>
+                    </select>
+                </div>
+                <div class="form-group span-2">
+                    <label for="input-remark">หมายเหตุพิเศษระบบภายใน</label>
+                    <input type="text" id="input-remark" placeholder="รายละเอียดเพิ่มเติม..." value="-">
+                </div>
+                <div class="form-group span-4">
+                    <div class="form-actions-wrapper">
+                        <button type="button" class="btn-modern-ghost" id="btn-cancel-edit-mode" onclick="exitEditMode()" style="display:none;">ยกเลิก</button>
+                        <button type="submit" class="btn-solid-primary" id="btn-submit-main">บันทึกข้อมูลเข้าระบบ</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="glass-panel">
+        <h2 style="margin-bottom: 18px;">ทำเนียบประวัติข้อมูลทะเบียนใบลา</h2>
+        <div class="table-responsive-box">
+            <table id="mainLeaveTable">
+                <thead>
+                    <tr>
+                        <th style="width: 85px;">เลขทะเบียน</th>
+                        <th style="width: 105px;">วันที่รายงาน</th>
+                        <th>ชื่อผู้ยื่นใบลา</th>
+                        <th style="width: 85px;">เรียนถึง</th>
+                        <th style="width: 100px;">ประเภทลา</th>
+                        <th>ช่วงระยะเวลาวันลา</th>
+                        <th style="width: 95px;">จำนวนวัน</th>
+                        <th style="width: 85px;">หน่วยงาน</th>
+                        <th>หมายเหตุ</th>
+                        <th style="text-align:right; width: 170px;">การจัดการระบบ</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" id="downloadModal">
+    <div class="modal-card">
+        <h3>จัดทำเอกสารรายงานสรุป</h3>
+        <p>โปรดระบุช่วงเลขทะเบียนเพื่อทำการประมวลผลสรุปข้อมูล</p>
+        <div class="modal-grid">
+            <div class="form-group">
+                <label>ทะเบียนเริ่มต้น</label>
+                <input type="number" id="range-start-id" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label>ทะเบียนสิ้นสุด</label>
+                <input type="number" id="range-end-id" value="10" min="1">
+            </div>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn-modern-ghost" onclick="closeRangeModal()">ยกเลิก</button>
+            <button class="btn-solid-primary" onclick="generateWordReport()">ดาวน์โหลด (.doc)</button>
+        </div>
+    </div>
+</div>
+<script>
+    let savedNamesMap = {};
+
+    window.onload = function () {
+        const loggedInName = localStorage.getItem('loggedInUser') || "ผู้ดูแลระบบ";
+        document.getElementById('current-user-display').innerText = loggedInName;
+        document.getElementById('user-avatar-initial').innerText = loggedInName.trim().charAt(0) || '·';
+        syncRegNumber();
+        updateStatCards();
+    };
+
+    function logoutUser() {
+        if (confirm('ยืนยันการออกจากระบบ?')) {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        }
+    }
+
+    function handlePrefixChange() {
+        const select = document.getElementById('input-emp-prefix');
+        const customInput = document.getElementById('input-custom-prefix');
+        if (select.value === "CUSTOM_OTHER") {
+            customInput.style.display = "block";
+            customInput.required = true;
+        } else {
+            customInput.style.display = "none";
+            customInput.required = false;
+            customInput.value = "";
+        }
+    }
+
+    function updateStatCards() {
+        const rows = Array.from(document.querySelectorAll('#mainLeaveTable tbody tr'));
+        let sickCount = 0, personalCount = 0, vacationCount = 0;
+        rows.forEach(r => {
+            const typeCell = r.querySelector('.cell-type');
+            if (!typeCell) return;
+            const typeText = typeCell.innerText.trim();
+            if (typeText === 'ลาป่วย') sickCount++;
+            else if (typeText === 'ลากิจ') personalCount++;
+            else if (typeText === 'ลาพักผ่อน') vacationCount++;
+        });
+        document.getElementById('stat-total').innerText = rows.length;
+        document.getElementById('stat-sick').innerText = sickCount;
+        document.getElementById('stat-personal').innerText = personalCount;
+        document.getElementById('stat-vacation').innerText = vacationCount;
+    }
+
+    function syncRegNumber() {
+        const nextVal = document.getElementById('global-next-reg').value;
+        if (document.getElementById('active-edit-row-id').value === "") {
+            document.getElementById('input-reg-num').value = nextVal;
+            validateDuplicateReg();
+        }
+    }
+
+    function validateDuplicateReg() {
+        const regInput = document.getElementById('input-reg-num');
+        const errorMsg = document.getElementById('reg-error-msg');
+        const submitBtn = document.getElementById('btn-submit-main');
+        const currentVal = regInput.value.trim();
+        const activeEditId = document.getElementById('active-edit-row-id').value;
+        if (!currentVal) { submitBtn.disabled = false; return; }
+        const rows = Array.from(document.querySelectorAll('#mainLeaveTable tbody tr'));
+        let isDuplicate = false;
+        rows.forEach((r) => {
+            if (activeEditId !== "" && r.id === activeEditId) return;
+            const existingReg = r.querySelector('.cell-reg').innerText.trim();
+            if (existingReg === currentVal) { isDuplicate = true; }
+        });
+        if (isDuplicate) {
+            regInput.classList.add('duplicate-error');
+            errorMsg.style.display = "block";
+            submitBtn.disabled = true;
+        } else {
+            regInput.classList.remove('duplicate-error');
+            errorMsg.style.display = "none";
+            submitBtn.disabled = false;
+        }
+    }
+
+    function toggleHalfDayMenu() {
+        const checked = document.getElementById('check-half-day').checked;
+        document.getElementById('menu-half-day-time').style.display = checked ? "flex" : "none";
+        execDaysCalc();
+    }
+
+    function execDaysCalc() {
+        const d1 = document.getElementById('input-start-date').value;
+        const d2 = document.getElementById('input-end-date').value;
+        const isHalf = document.getElementById('check-half-day').checked;
+        const outField = document.getElementById('input-total-days');
+        if (d1 && d2) {
+            const dateStart = new Date(d1);
+            const dateEnd = new Date(d2);
+            if (dateEnd >= dateStart) {
+                let count = Math.ceil(Math.abs(dateEnd - dateStart) / (1000 * 60 * 60 * 24)) + 1;
+                outField.value = isHalf ? count + " (½) วัน" : count + " วัน";
+            } else {
+                outField.value = "ช่วงวันที่ไม่ถูกต้อง";
+            }
+        } else {
+            outField.value = isHalf ? "0 (½) วัน" : "0 วัน";
+        }
+    }
+
+    function parseThaiDate(strFormat) {
+        if (!strFormat) return "";
+        const d = new Date(strFormat);
+        const mList = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+        return `${d.getDate()} ${mList[d.getMonth()]} ${String(d.getFullYear() + 543).substring(2)}`;
+    }
+
+    function openRangeModal() { document.getElementById('downloadModal').style.display = "flex"; }
+    function closeRangeModal() { document.getElementById('downloadModal').style.display = "none"; }
+
+    function triggerEditMode(rowId) {
+        const tr = document.getElementById(rowId);
+        if (!tr) return;
+        document.getElementById('form-heading-title').innerText = "กำลังแก้ไขข้อมูลทะเบียนรับเลขที่: " + tr.querySelector('.cell-reg').innerText;
+        document.getElementById('active-edit-row-id').value = rowId;
+        document.getElementById('btn-cancel-edit-mode').style.display = "inline-block";
+        document.getElementById('btn-submit-main').innerText = "ยืนยันการแก้ไขข้อมูล";
+        document.getElementById('input-reg-num').value = tr.querySelector('.cell-reg').innerText;
+        document.getElementById('input-doc-date').value = tr.getAttribute('data-doc');
+        
+        const pureName = tr.getAttribute('data-pure-name') || "";
+        const savedPrefix = tr.getAttribute('data-prefix') || "นาย";
+        const prefixSelect = document.getElementById('input-emp-prefix');
+        const customInput = document.getElementById('input-custom-prefix');
+        
+        if (["นาย", "นางสาว", "นาง", "ว่าที่ร้อยตรีหญิง"].includes(savedPrefix)) {
+            prefixSelect.value = savedPrefix;
+            customInput.style.display = "none";
+            customInput.value = "";
+        } else {
+            prefixSelect.value = "CUSTOM_OTHER";
+            customInput.style.display = "block";
+            customInput.value = savedPrefix;
+        }
+        document.getElementById('input-emp-name').value = pureName;
+        
+        document.getElementById('input-leave-type').value = tr.getAttribute('data-type') || tr.querySelector('.cell-type').innerText.trim();
+        document.getElementById('input-start-date').value = tr.getAttribute('data-start');
+        document.getElementById('input-end-date').value = tr.getAttribute('data-end');
+        const checked = tr.getAttribute('data-is-half') === "true";
+        document.getElementById('check-half-day').checked = checked;
+        document.getElementById('menu-half-day-time').style.display = checked ? "flex" : "none";
+        if (checked) {
+            document.getElementById('select-half-time').value = tr.getAttribute('data-half-val');
+        }
+        const rawDept = (tr.getAttribute('data-dept') || tr.querySelector('.cell-action').innerText.replace('.', '')).trim();
+        document.getElementById('input-action-dept').value = rawDept;
+        document.getElementById('input-remark').value = tr.getAttribute('data-remark') || tr.querySelector('.cell-remark').innerText;
+        execDaysCalc();
+        validateDuplicateReg();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function exitEditMode() {
+        document.getElementById('form-heading-title').innerText = "บันทึกข้อมูลใบลาฉบับใหม่";
+        document.getElementById('active-edit-row-id').value = "";
+        document.getElementById('btn-cancel-edit-mode').style.display = "none";
+        document.getElementById('btn-submit-main').innerText = "บันทึกข้อมูลเข้าระบบ";
+        document.getElementById('leaveDataForm').reset();
+        document.getElementById('input-emp-prefix').value = "นาย";
+        document.getElementById('input-custom-prefix').style.display = "none";
+        document.getElementById('check-half-day').checked = false;
+        document.getElementById('menu-half-day-time').style.display = "none";
+        syncRegNumber();
+    }
+
+    function getLeaveBadgeClass(type) {
+        if (type === "ลาป่วย") return "badge-sick";
+        if (type === "ลากิจ") return "badge-personal";
+        return "badge-vacation";
+    }
+
+    function updateDatalist() {
+        const datalist = document.getElementById('emp-datalist');
+        datalist.innerHTML = "";
+        Object.keys(savedNamesMap).forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            datalist.appendChild(opt);
+        });
+    }
+
+    document.getElementById('leaveDataForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const activeEditId = document.getElementById('active-edit-row-id').value;
+        const regNum = parseInt(document.getElementById('input-reg-num').value);
+        const rawDoc = document.getElementById('input-doc-date').value;
+        const rawStart = document.getElementById('input-start-date').value;
+        const rawEnd = document.getElementById('input-end-date').value;
+        
+        const prefixSelect = document.getElementById('input-emp-prefix').value;
+        const empPrefix = prefixSelect === "CUSTOM_OTHER" ? document.getElementById('input-custom-prefix').value.trim() : prefixSelect;
+        const empPureName = document.getElementById('input-emp-name').value.trim();
+        const empName = empPrefix + " " + empPureName;
+        
+        if (empPureName) {
+            savedNamesMap[empPureName] = true;
+            updateDatalist();
+        }
+        
+        const supName = document.getElementById('input-sup-name').value;
+        const typeLeave = document.getElementById('input-leave-type').value;
+        const totalDays = document.getElementById('input-total-days').value;
+        const deptVal = document.getElementById('input-action-dept').value;
+        const remarkText = document.getElementById('input-remark').value || "-";
+        const isHalf = document.getElementById('check-half-day').checked;
+        const halfTimeStr = isHalf ? document.getElementById('select-half-time').value : "";
+        const badgeClass = getLeaveBadgeClass(typeLeave);
+        
+        let textRange = rawStart === rawEnd ? parseThaiDate(rawStart) : `${parseThaiDate(rawStart)} - ${parseThaiDate(rawEnd)}`;
+        if (isHalf) { textRange = `${parseThaiDate(rawStart)} (${halfTimeStr})`; }
+
+        if (activeEditId !== "") {
+            const tr = document.getElementById(activeEditId);
+            if (tr) {
+                let currentEditCount = parseInt(tr.getAttribute('data-edits') || 0) + 1;
+                const editorName = document.getElementById('current-user-display').innerText;
+                const now = new Date();
+                const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} น.`;
+                const dateStr = parseThaiDate(now.toISOString().split('T')[0]);
+
+                let changes = [];
+                const oldReg = tr.querySelector('.cell-reg').innerText.trim();
+                const oldDoc = tr.getAttribute('data-doc');
+                const oldEmp = tr.getAttribute('data-emp') || tr.querySelector('.cell-name').innerText.trim();
+                const oldType = tr.getAttribute('data-type') || tr.querySelector('.cell-type').innerText.trim();
+                const oldStart = tr.getAttribute('data-start');
+                const oldEnd = tr.getAttribute('data-end');
+                const oldIsHalf = tr.getAttribute('data-is-half') === "true";
+                const oldHalfVal = tr.getAttribute('data-half-val') || "";
+                const oldDept = (tr.getAttribute('data-dept') || "").trim();
+                const oldRemark = tr.getAttribute('data-remark') || tr.querySelector('.cell-remark').innerText.trim();
+
+                if (oldReg !== String(regNum)) changes.push(`เลขทะเบียน: ${oldReg} เป็น ${regNum}`);
+                if (oldDoc !== rawDoc) changes.push(`วันที่รายงาน: ${parseThaiDate(oldDoc)} เป็น ${parseThaiDate(rawDoc)}`);
+                if (oldEmp !== empName) changes.push(`ชื่อพนักงาน: ${oldEmp} เป็น ${empName}`);
+                if (oldType !== typeLeave) changes.push(`ประเภทลา: ${oldType} เป็น ${typeLeave}`);
+                if (oldStart !== rawStart || oldEnd !== rawEnd || oldIsHalf !== isHalf || oldHalfVal !== halfTimeStr) {
+                    let oldRangeText = oldStart === oldEnd ? parseThaiDate(oldStart) : `${parseThaiDate(oldStart)} - ${parseThaiDate(oldEnd)}`;
+                    if (oldIsHalf) oldRangeText = `${parseThaiDate(oldStart)} (${oldHalfVal})`;
+                    changes.push(`ระยะเวลา: ${oldRangeText} เป็น ${textRange}`);
+                }
+                if (oldDept !== deptVal) changes.push(`หน่วยงาน: ${oldDept} เป็น ${deptVal}`);
+                if (oldRemark !== remarkText) changes.push(`หมายเหตุ: ${oldRemark} เป็น ${remarkText}`);
+
+                let historyArray = [];
+                try { historyArray = JSON.parse(tr.getAttribute('data-history-log') || '[]'); } catch (err) { historyArray = []; }
+
+                historyArray.push({ count: currentEditCount, user: editorName, date: dateStr, time: timeStr, changes: changes });
+
+                tr.setAttribute('data-doc', rawDoc);
+                tr.setAttribute('data-start', rawStart);
+                tr.setAttribute('data-end', rawEnd);
+                tr.setAttribute('data-is-half', isHalf ? "true" : "false");
+                tr.setAttribute('data-half-val', halfTimeStr);
+                tr.setAttribute('data-edits', currentEditCount);
+                tr.setAttribute('data-history-log', JSON.stringify(historyArray));
+                tr.setAttribute('data-emp', empName);
+                tr.setAttribute('data-prefix', empPrefix);
+                tr.setAttribute('data-pure-name', empPureName);
+                tr.setAttribute('data-type', typeLeave);
+                tr.setAttribute('data-dept', deptVal);
+                tr.setAttribute('data-remark', remarkText);
+
+                let timelineItemsHtml = "";
+                historyArray.forEach(item => {
+                    let changesHtml = "";
+                    if (item.changes && item.changes.length > 0) {
+                        changesHtml = `<div class="history-change-log">`;
+                        item.changes.forEach(c => { changesHtml += `<div class="history-change-item">แก้ไข ${c}</div>`; });
+                        changesHtml += `</div>`;
+                    }
+                    timelineItemsHtml += `
+                        <div class="history-card-item">
+                            <div class="history-card-title">แก้ไขครั้งที่ ${item.count}</div>
+                            <div class="history-card-meta">ผู้แก้ไข: <b>${item.user}</b></div>
+                            <div class="history-card-meta">${item.date} | ${item.time}</div>
+                            ${changesHtml}
+                        </div>
+                    `;
+                });
+
+                tr.innerHTML = `
+                    <td class="cell-reg">${regNum}</td>
+                    <td class="cell-doc">${parseThaiDate(rawDoc)}</td>
+                    <td class="cell-name">${empName}</td>
+                    <td class="cell-sup">${supName}</td>
+                    <td class="cell-type"><span class="badge-type ${badgeClass}">${typeLeave}</span></td>
+                    <td class="cell-range">${textRange}</td>
+                    <td class="cell-days">${totalDays}</td>
+                    <td class="cell-action">${getDeptBadge(deptVal)}</td>
+                    <td class="cell-remark">${remarkText}</td>
+                    <td style="text-align:right;">
+                        <button class="action-link" onclick="triggerEditMode('${activeEditId}')">แก้ไข</button>
+                        <div class="history-container">
+                            <span class="history-trigger-text">ปรับปรุงแล้ว ${currentEditCount} ครั้ง</span>
+                            <div class="history-tooltip-box">
+                                <div class="history-header">ไทม์ไลน์ประวัติการบันทึกข้อมูล</div>
+                                <div class="history-timeline-flow">${timelineItemsHtml}</div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+            }
+            exitEditMode();
+            resortTableRecords();
+        } else {
+            const tbody = document.querySelector('#mainLeaveTable tbody');
+            const newTr = document.createElement('tr');
+            const uniqueId = "row-uid-" + Date.now();
+            newTr.id = uniqueId;
+            newTr.setAttribute('data-doc', rawDoc);
+            newTr.setAttribute('data-start', rawStart);
+            newTr.setAttribute('data-end', rawEnd);
+            newTr.setAttribute('data-is-half', isHalf ? "true" : "false");
+            newTr.setAttribute('data-half-val', halfTimeStr);
+            newTr.setAttribute('data-edits', "0");
+            newTr.setAttribute('data-history-log', "[]");
+            newTr.setAttribute('data-emp', empName);
+            newTr.setAttribute('data-prefix', empPrefix);
+            newTr.setAttribute('data-pure-name', empPureName);
+            newTr.setAttribute('data-type', typeLeave);
+            newTr.setAttribute('data-dept', deptVal);
+            newTr.setAttribute('data-remark', remarkText);
+
+            newTr.innerHTML = `
+                <td class="cell-reg">${regNum}</td>
+                <td class="cell-doc">${parseThaiDate(rawDoc)}</td>
+                <td class="cell-name">${empName}</td>
+                <td class="cell-sup">${supName}</td>
+                <td class="cell-type"><span class="badge-type ${badgeClass}">${typeLeave}</span></td>
+                <td class="cell-range">${textRange}</td>
+                <td class="cell-days">${totalDays}</td>
+                <td class="cell-action">${getDeptBadge(deptVal)}</td>
+                <td class="cell-remark">${remarkText}</td>
+                <td style="text-align:right;">
+                    <button class="action-link" onclick="triggerEditMode('${uniqueId}')">แก้ไข</button>
+                    <div class="history-container" style="display:none;"></div>
+                </td>
+            `;
+            tbody.appendChild(newTr);
+            document.getElementById('global-next-reg').value = regNum + 1;
+            exitEditMode();
+            resortTableRecords();
+        }
+        updateStatCards();
+    });
+
+    function resortTableRecords() {
+        const tbody = document.querySelector('#mainLeaveTable tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => parseInt(a.querySelector('.cell-reg').innerText) - parseInt(b.querySelector('.cell-reg').innerText));
+        rows.forEach(r => tbody.appendChild(r));
+    }
+
+    function getDeptBadge(dept){
+        const map={"สอก":"dept-sok","สวว":"dept-swv","สวป":"dept-swp","สวล":"dept-swl","สสท":"dept-sst"};
+        return `<span class="badge-dept ${map[dept]||''}">${dept}.</span>`;
+    }
+
+    function generateWordReport() {
+        const startId = parseInt(document.getElementById('range-start-id').value);
+        const endId = parseInt(document.getElementById('range-end-id').value);
+        if (isNaN(startId) || isNaN(endId) || startId > endId) {
+            alert("กรุณาระบุช่วงเลขทะเบียนรับให้ถูกต้อง");
+            return;
+        }
+        const rows = Array.from(document.querySelectorAll('#mainLeaveTable tbody tr'));
+        const targetRows = rows.filter(r => {
+            const num = parseInt(r.querySelector('.cell-reg').innerText);
+            return num >= startId && num <= endId;
+        });
+        if (targetRows.length === 0) {
+            alert("ไม่พบข้อมูลทะเบียนรับในช่วงที่เลือก");
+            return;
+        }
+        targetRows.sort((a, b) => parseInt(a.querySelector('.cell-reg').innerText) - parseInt(b.querySelector('.cell-reg').innerText));
+        const now = new Date();
+        const thMonthsFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        const printDateTimeStr = `วันที่พิมพ์: ${now.getDate()} ${thMonthsFull[now.getMonth()]} ${now.getFullYear() + 543} เวลา ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} น.`;
+        let rowsHtml = "";
+        targetRows.forEach(r => {
+            rowsHtml += `
+                <tr style="border:1px solid #000000;">
+                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-reg').innerText}</td>
+                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-doc').innerText}</td>
+                    <td style="border:1px solid #000000; padding:7px;">${r.querySelector('.cell-name').innerText}</td>
+                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-sup').innerText}</td>
+                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-type').innerText}</td>
+                    <td style="border:1px solid #000000; padding:7px;">${r.querySelector('.cell-range').innerText}</td>
+                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-days').innerText}</td>
+                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-action').innerText}</td>
+                    <td style="border:1px solid #000000; padding:7px;">${r.querySelector('.cell-remark').innerText}</td>
+                </tr>
+            `;
+        });
+        const htmlPayload = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head>
+                <meta charset='utf-8'>
+                <style>
+                    @page Section1 { 
+                        size: 11.69in 8.27in; 
+                        margin: 0.7in 0.7in 0.7in 0.7in; 
+                        mso-page-orientation: landscape; 
+                    }
+                    div.Section1 { page: Section1; }
+                    body { font-family: 'TH SarabunPSK', 'TH Sarabun New', sans-serif; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th { border: 1px solid #000000; padding: 7px; background-color: #f2f2f2; font-size: 14pt; font-weight: bold; text-align:center; }
+                    td { font-size: 14pt; }
+                </style>
+            </head>
+            <body>
+                <div class="Section1">
+                    <p style="text-align:right; font-size:13pt; margin:0;">${printDateTimeStr}</p>
+                    <h2 style="text-align:center; font-size:18pt; font-weight:bold; margin:10px 0;">รายงานทะเบียนรับใบลาป่วย / ลากิจ / ลาพักผ่อนพนักงาน</h2>
+                    <p style="text-align:center; font-size:14pt; margin:0 0 15px 0;">ข้อมูลเลขทะเบียนรับลำดับช่วงที่ ${startId} ถึงลำดับที่ ${endId}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 7%;">ทะเบียนรับ</th>
+                                <th style="width: 10%;">ลงวันที่</th>
+                                <th style="width: 18%;">จาก</th>
+                                <th style="width: 8%;">ถึง</th>
+                                <th style="width: 10%;">ประเภทการลา</th>
+                                <th style="width: 20%;">ลาวันที่</th>
+                                <th style="width: 8%;">จำนวนวัน</th>
+                                <th style="width: 8%;">การปฏิบัติ</th>
+                                <th style="width: 11%;">หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                </div>
+            </body>
+            </html>
+        `;
+        const blob = new Blob(['\ufeff' + htmlPayload], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const aLink = document.createElement('a');
+        aLink.href = url;
+        aLink.download = `รายงานทะเบียนใบลา_${startId}_ถึง_${endId}.doc`;
+        document.body.appendChild(aLink);
+        aLink.click();
+        document.body.removeChild(aLink);
+        closeRangeModal();
+    }
+</script>
+</body>
+</html>
