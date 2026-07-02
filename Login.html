@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ | ระบบทะเบียนรับใบลาพนักงาน</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* โทนพาสเทลเซจ-มินต์ นุ่มนวล อบอุ่น เป็นทางการแบบไม่แข็งกระด้าง */
+            --bg-canvas: #f4faf7;
+            --bg-card: #ffffff;
+            --color-primary: #4f7a68;
+            --color-primary-deep: #365d4e;
+            --color-mint: #bfe3d0;
+            --color-apricot: #f3d9b1;
+            --text-dark: #33413b;
+            --text-muted: #7c8b84;
+            --border-color: #e3ede7;
+            --error-color: #d97878;
+            --radius-lg: 24px;
+            --radius-md: 14px;
+            --shadow-soft: 0 20px 50px rgba(79, 122, 104, 0.12);
+        }
+
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; margin: 0; padding: 0; }
+
+        html, body { height: 100%; }
+
+        body {
+            background: var(--bg-canvas);
+            color: var(--text-dark);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ---------- ฝั่งซ้าย: อัตลักษณ์ภาพ ---------- */
+        .brand-side {
+            flex: 1.1;
+            position: relative;
+            background: linear-gradient(160deg, #3f6656 0%, #4f7a68 55%, #6fa088 100%);
+            color: #eef7f1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 56px 60px;
+            overflow: hidden;
+        }
+
+        .brand-side::before,
+        .brand-side::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .brand-side::before { width: 420px; height: 420px; top: -140px; right: -120px; }
+        .brand-side::after { width: 280px; height: 280px; bottom: -100px; left: -60px; background: rgba(255,255,255,0.05); }
+
+        .brand-mark {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+        .brand-mark .leaf-icon { width: 34px; height: 34px; flex-shrink: 0; }
+        .brand-mark span {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            opacity: 0.92;
+        }
+
+        .brand-copy { position: relative; z-index: 1; max-width: 380px; }
+        .brand-copy h1 {
+            font-size: 34px;
+            font-weight: 700;
+            line-height: 1.35;
+            margin-bottom: 16px;
+        }
+        .brand-copy p {
+            font-size: 15px;
+            font-weight: 300;
+            line-height: 1.7;
+            opacity: 0.85;
+        }
+
+        .brand-footer {
+            position: relative;
+            z-index: 1;
+            font-size: 12.5px;
+            font-weight: 300;
+            opacity: 0.65;
+        }
+
+        /* ---------- ฝั่งขวา: ฟอร์ม ---------- */
+        .form-side {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .login-card .eyebrow {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-primary);
+            letter-spacing: 0.4px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .login-card .eyebrow .leaf-icon-sm { width: 16px; height: 16px; display: none; }
+
+        .login-card h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .login-card .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 300;
+            margin-bottom: 32px;
+        }
+
+        .input-group { margin-bottom: 18px; }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .input-wrap { position: relative; }
+
+        input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            color: var(--text-dark);
+            background-color: #fbfdfc;
+            transition: all 0.2s;
+        }
+
+        input::placeholder { color: #b7c4bd; font-weight: 300; }
+
+        input:focus {
+            border-color: var(--color-primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(79, 122, 104, 0.1);
+            outline: none;
+        }
+
+        .input-wrap.has-toggle input { padding-right: 46px; }
+
+        .toggle-visibility {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-radius: 8px;
+            padding: 0;
+        }
+        .toggle-visibility:hover { background: #f1f6f3; color: var(--color-primary); }
+        .toggle-visibility svg { width: 19px; height: 19px; }
+
+        .form-error {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: #fdf3f3;
+            border: 1px solid #f3d9d9;
+            color: var(--error-color);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 11px 14px;
+            border-radius: var(--radius-md);
+            margin-bottom: 18px;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15.5px;
+            font-weight: 600;
+            color: white;
+            background-color: var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button[type="submit"]:hover { background-color: var(--color-primary-deep); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(79,122,104,0.22); }
+        button[type="submit"]:active { transform: scale(0.98); }
+        button[type="submit"]:disabled { background-color: #cddcd4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .login-footnote {
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            font-weight: 300;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .brand-side { display: none; }
+            .form-side { padding: 60px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="brand-side">
+        <div class="brand-mark">
+            <svg class="leaf-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 38C10 24 18 12 38 10C38 30 26 38 12 38C11 38 10 38 10 38Z" fill="#eef7f1" fill-opacity="0.92"/>
+                <path d="M12 36C18 26 24 20 36 12" stroke="#3f6656" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <span>ฝ่ายการเจ้าหน้าที่ · ส่วนอำนวยการ สวพ.</span>
+        </div>
+
+        <div class="brand-copy">
+            <h1>ระบบสำหรับทะเบียนรับ<br>ใบลาพนักงาน สวพ.</h1>
+        </div>
+
+        <div class="brand-footer">เข้าสู่ระบบ</div>
+    </div>
+
+    <div class="form-side">
+        <div class="login-card">
+            <div class="eyebrow">เข้าสู่ระบบสำหรับเจ้าหน้าที่</div>
+            <h2>ยินดีต้อนรับกลับ</h2>
+            <div class="subtitle">กรอกรหัสพนักงานและรหัสผ่านเพื่อเข้าใช้งาน</div>
+
+            <div class="form-error" id="formError">
+                <span>⚠️</span><span id="formErrorText">เกิดข้อผิดพลาด</span>
+            </div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="loginUser">รหัสพนักงาน</label>
+                    <input type="text" id="loginUser" placeholder="เช่น HR001" autocomplete="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="loginPass">รหัสผ่าน</label>
+                    <div class="input-wrap has-toggle">
+                        <input type="password" id="loginPass" placeholder="กรุณาใส่รหัสผ่าน" autocomplete="current-password" required>
+                        <button type="button" class="toggle-visibility" id="toggleBtn" aria-label="แสดงรหัสผ่าน">
+                            <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" id="submitBtn">
+                    <span class="spinner" id="btnSpinner"></span>
+                    <span id="btnLabel">เข้าสู่ระบบ</span>
+                </button>
+            </form>
+
+            <div class="login-footnote">ลืมรหัสผ่าน? ติดต่อเจ้าหน้าที่ควบคุมระบบ</div>
+        </div>
+    </div>
+
+    <script>
+        // ปลายทาง Google Apps Script Web App: ต้องรับ { action:'login', username, password }
+        // และตอบกลับเป็น { status:'success', name:'<ชื่อ-นามสกุลจริงจากชีต>', empId:'<รหัสพนักงาน>' }
+        // หรือ { status:'error', message:'...' } เมื่อข้อมูลไม่ถูกต้อง
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrsqpxZU-7VZTu2d-YHlNHr8vunweyG8N03m811Df2KmGqVcNlbQBnLzhDvAeybvyI/exec";
+
+        const toggleBtn = document.getElementById('toggleBtn');
+        const passInput = document.getElementById('loginPass');
+        toggleBtn.addEventListener('click', () => {
+            const isPw = passInput.type === 'password';
+            passInput.type = isPw ? 'text' : 'password';
+        });
+
+        function showFormError(msg) {
+            document.getElementById('formErrorText').innerText = msg;
+            document.getElementById('formError').style.display = 'flex';
+        }
+        function hideFormError() {
+            document.getElementById('formError').style.display = 'none';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hideFormError();
+
+            const btn = document.getElementById('submitBtn');
+            const btnLabel = document.getElementById('btnLabel');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const usernameInput = document.getElementById('loginUser').value.trim();
+            const passwordInput = document.getElementById('loginPass').value;
+
+            btnLabel.innerText = "กำลังตรวจสอบข้อมูล...";
+            btnSpinner.style.display = "inline-block";
+            btn.disabled = true;
+
+            try {
+                const payload = { action: "login", username: usernameInput, password: passwordInput };
+                const response = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    localStorage.setItem('loggedInUser', result.name || usernameInput);
+                    localStorage.setItem('loggedInEmpId', result.empId || usernameInput);
+                    window.location.href = 'Leave.html';
+                } else {
+                    showFormError(result.message || "รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง");
+                }
+            } catch (error) {
+                showFormError("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาตรวจสอบแล้วลองใหม่");
+            } finally {
+                btnLabel.innerText = "เข้าสู่ระบบ";
+                btnSpinner.style.display = "none";
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
