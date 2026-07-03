@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบทะเบียนใบลาพนักงาน</title>
+    <title>ระบบทะเบียนใบลาเจ้าหน้าที่ สวพ.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -84,6 +84,12 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .user-profile-badge:hover {
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .user-avatar {
             width: 30px; height: 30px;
@@ -393,17 +399,17 @@
     <header>
         <div class="header-title-block">
             <div>
-                <h1>ระบบทะเบียนใบลาพนักงาน</h1>
+                <h1>ระบบทะเบียนใบลาเจ้าหน้าที่ สวพ.</h1>
                 <p>ฝ่ายการเจ้าหน้าที่ · ส่วนอำนวยการ สวพ.</p>
             </div>
         </div>
         <div class="header-controls">
-            <button class="btn-modern-primary" onclick="openRangeModal()">พิมพ์ทะเบียนรับ</button>
+            <button class="btn-modern-primary" onclick="openRangeModal()">พิมพ์รายงานสรุป</button>
             <div class="reg-counter-card">
                 <span>ทะเบียนถัดไป:</span>
                 <input type="number" id="global-next-reg" value="1" onchange="syncRegNumber()">
             </div>
-            <div class="user-profile-badge">
+            <div class="user-profile-badge" title="คลิกเพื่อออกจากระบบ" onclick="handleLogoutRedirect()">
                 <span class="user-avatar" id="user-avatar-initial">·</span>
                 <span id="current-user-display">กำลังดึงข้อมูลชื่อ...</span>
             </div>
@@ -439,11 +445,11 @@
                             <option value="CUSTOM_OTHER">อื่นๆ (ระบุเอง)</option>
                         </select>
                         <input type="text" id="input-custom-prefix" class="custom-prefix-input" placeholder="ระบุคำนำหน้า...">
-                        <input type="text" id="input-emp-name" class="name-fullname-input" list="emp-datalist" required placeholder="กรุณากรอกชื่อ-นามสกุล...">
+                        <input type="text" id="input-emp-name" class="name-fullname-input" list="emp-datalist" required placeholder="พิมพ์ชื่อ-นามสกุลพนักงาน...">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>ถึง</label>
+                    <label>ถึง (ผู้รับรายงาน)</label>
                     <input type="text" id="input-sup-name" value="ผอ.สวพ" readonly style="background:#f4f7f5; color:var(--text-muted); cursor:not-allowed;">
                 </div>
                 <div class="form-group">
@@ -532,7 +538,7 @@
         </div>
         
         <div class="glass-panel">
-            <div class="panel-head"><h2 id="form-heading-title">บันทึกข้อมูลใบลาฉบับใหม่ (ลาป่วย/ลากิจ)</h2></div>
+            <div class="panel-head"><h2 id="form-heading-title">บันทึกข้อมูลใบลาป่วย/ลากิจ)</h2></div>
             <div id="form-general-placeholder"></div>
         </div>
 
@@ -580,13 +586,13 @@
         </div>
 
         <div class="glass-panel">
-            <div class="panel-head"><h2 id="form-heading-title-vacation">บันทึกข้อมูลใบลาพักผ่อนฉบับใหม่</h2></div>
+            <div class="panel-head"><h2 id="form-heading-title-vacation">บันทึกข้อมูลใบลาพักผ่อน</h2></div>
             <div id="form-vacation-placeholder"></div>
         </div>
 
         <div class="glass-panel">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                <h2>ทำเนียบประวัติข้อมูลทะเบียนใบลาพักผ่อน</h2>
+                <h2>ทะเบียนรับใบลาพักผ่อน</h2>
                 <div class="history-container" id="deleted-history-master-vacation" style="display:none;">
                     <span class="history-trigger-text" style="color:var(--error-color); font-weight:700; font-size:13px;" onclick="toggleDeletedTooltip(event, 'vacation')">ดูประวัติการลบรายการ 📋</span>
                     <div class="history-tooltip-box" id="deleted-master-tooltip-vacation" style="right:0; width:420px; display:none;">
@@ -617,13 +623,14 @@
         </div>
     </div>
 
+    <div id="blanket-popup-context" style="display:none;"></div>
     <datalist id="emp-datalist"></datalist>
 </div>
 
 <div class="modal-overlay" id="downloadModal">
     <div class="modal-card">
         <h3>จัดทำเอกสารรายงานสรุป</h3>
-        <p>โปรดระบุช่วงเลขทะเบียนเพื่อทำการประมวลผลสรุปข้อมูล</p>
+        <p>โปรดระบุช่วงเลขทะเบียนเพื่อทำการประมวลผลข้อมูล</p>
         <div class="modal-grid">
             <div class="form-group">
                 <label>ทะเบียนเริ่มต้น</label>
@@ -667,6 +674,13 @@
             });
         });
     };
+
+    function handleLogoutRedirect() {
+        if (confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = "index.html";
+        }
+    }
 
     function switchSheet(sheetName) {
         exitEditMode();
@@ -956,7 +970,7 @@
                 <div class="deleted-log-card">
                     <div class="deleted-log-title">
                         <span>ข้อมูลถูกนำออกระบบ</span>
-                        <span class="deleted-log-reg-badge">ทะเบียนเลขที่ ${item.reg}</span>
+                        <span class="deleted-log-reg-badge">เลขทะเบียน ${item.reg}</span>
                     </div>
                     <div class="deleted-log-meta">ชื่อเจ้าของใบลา: <b>${item.emp}</b></div>
                     <div class="deleted-log-meta">ผู้บันทึกข้อมูลแรกเริ่ม: <b>${item.creator}</b></div>
@@ -969,8 +983,8 @@
     }
 
     function exitEditMode() {
-        document.getElementById('form-heading-title').innerText = "บันทึกข้อมูลใบลาฉบับใหม่ (ลาป่วย/ลากิจ)";
-        document.getElementById('form-heading-title-vacation').innerText = "บันทึกข้อมูลใบลาพักผ่อนฉบับใหม่";
+        document.getElementById('form-heading-title').innerText = "บันทึกข้อมูลใบลาป่วย/ลากิจ";
+        document.getElementById('form-heading-title-vacation').innerText = "บันทึกข้อมูลใบลาพักผ่อน";
         document.getElementById('active-edit-row-id').value = "";
         document.getElementById('btn-cancel-edit-mode').style.display = "none";
         document.getElementById('btn-submit-main').innerText = "บันทึกข้อมูลเข้าระบบ";
@@ -1257,7 +1271,7 @@
         const thMonthsFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const printDateTimeStr = `วันที่พิมพ์: ${now.getDate()} ${thMonthsFull[now.getMonth()]} ${now.getFullYear() + 543} เวลา ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} น.`;
         
-        const reportTitle = currentActiveSheet === 'general' ? 'รายงานทะเบียนรับใบลาป่วย / ลากิจ / ยกเลิกวันลาพนักงาน' : 'รายงานทะเบียนรับใบลาพักผ่อนพนักงาน';
+        const reportTitle = currentActiveSheet === 'general' ? 'รายงานทะเบียนรับใบลาป่วย / ลากิจ / ยกเลิกวันลา สวพ.' : 'รายงานทะเบียนรับใบลาพักผ่อนพนักงาน สวพ.';
         const filePrefix = currentActiveSheet === 'general' ? 'รายงานทะเบียนใบลาทั่วไป' : 'รายงานทะเบียนใบลาพักผ่อน';
 
         let rowsHtml = "";
