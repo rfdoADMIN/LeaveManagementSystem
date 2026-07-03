@@ -10,7 +10,6 @@
 
     <style>
         :root {
-            /* โทนพาสเทลเซจ-มินต์ นุ่มนวล อบอุ่น เป็นทางการแบบไม่แข็งกระด้าง */
             --bg-canvas: #f4faf7;
             --bg-card: #ffffff;
             --color-primary: #4f7a68;
@@ -38,7 +37,6 @@
             overflow-x: hidden;
         }
 
-        /* ---------- ฝั่งซ้าย: อัตลักษณ์ภาพ ---------- */
         .brand-side {
             flex: 1.1;
             position: relative;
@@ -98,7 +96,6 @@
             opacity: 0.65;
         }
 
-        /* ---------- ฝั่งขวา: ฟอร์ม ---------- */
         .form-side {
             flex: 1;
             display: flex;
@@ -304,9 +301,6 @@
     </div>
 
     <script>
-        // ปลายทาง Google Apps Script Web App: ต้องรับ { action:'login', username, password }
-        // และตอบกลับเป็น { status:'success', name:'<ชื่อ-นามสกุลจริงจากชีต>', empId:'<รหัสพนักงาน>' }
-        // หรือ { status:'error', message:'...' } เมื่อข้อมูลไม่ถูกต้อง
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrsqpxZU-7VZTu2d-YHlNHr8vunweyG8N03m811Df2KmGqVcNlbQBnLzhDvAeybvyI/exec";
 
         const toggleBtn = document.getElementById('toggleBtn');
@@ -346,7 +340,7 @@
                 if (result.status === "success") {
                     localStorage.setItem('loggedInUser', result.name || usernameInput);
                     localStorage.setItem('loggedInEmpId', result.empId || usernameInput);
-                    window.location.href = 'Leave.html';
+                    window.location.href = 'index.html';
                 } else {
                     showFormError(result.message || "รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง");
                 }
