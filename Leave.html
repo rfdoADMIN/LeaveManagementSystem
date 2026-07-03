@@ -407,7 +407,7 @@
             <button class="btn-modern-primary" onclick="openRangeModal()">พิมพ์รายงานสรุป</button>
             <div class="reg-counter-card">
                 <span>ทะเบียนถัดไป:</span>
-                <input type="number" id="global-next-reg" value="1" onchange="syncRegNumber()">
+                <input type="number" id="global-next-reg" value="1" min="1" onchange="syncRegNumber()">
             </div>
             <div class="user-profile-badge" title="คลิกเพื่อออกจากระบบ" onclick="handleLogoutRedirect()">
                 <span class="user-avatar" id="user-avatar-initial">·</span>
@@ -427,7 +427,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>เลขทะเบียนรับ</label>
-                    <input type="number" id="input-reg-num" required oninput="validateDuplicateReg()">
+                    <input type="number" id="input-reg-num" min="1" required oninput="validateDuplicateReg()">
                     <div class="error-msg-text" id="reg-error-msg">เลขทะเบียนนี้ถูกใช้งานไปแล้ว</div>
                 </div>
                 <div class="form-group">
@@ -754,11 +754,16 @@
     }
 
     function syncRegNumber() {
-        const nextVal = document.getElementById('global-next-reg').value;
+        let nextVal = parseInt(document.getElementById('global-next-reg').value) || 1;
+        if (nextVal < 1) {
+            nextVal = 1;
+            document.getElementById('global-next-reg').value = 1;
+        }
+
         if (currentActiveSheet === 'general') {
-            nextRegGeneral = parseInt(nextVal) || 1;
+            nextRegGeneral = nextVal;
         } else {
-            nextRegVacation = parseInt(nextVal) || 1;
+            nextRegVacation = nextVal;
         }
         
         if (document.getElementById('active-edit-row-id').value === "") {
@@ -769,9 +774,17 @@
 
     function validateDuplicateReg() {
         const regInput = document.getElementById('input-reg-num');
+        let currentValNum = parseInt(regInput.value) || 1;
+        
+        // ล็อกไม่ให้ค่าทะเบียนติดลบหรือเป็น 0 โดยดีดกลับมาเป็น 1 ทันที
+        if (currentValNum < 1) {
+            currentValNum = 1;
+            regInput.value = 1;
+        }
+
         const errorMsg = document.getElementById('reg-error-msg');
         const submitBtn = document.getElementById('btn-submit-main');
-        const currentVal = regInput.value.trim();
+        const currentVal = String(currentValNum).trim();
         const activeEditId = document.getElementById('active-edit-row-id').value;
         if (!currentVal) { checkDateOrderValidity(); return; }
         
@@ -1271,7 +1284,7 @@
         const thMonthsFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const printDateTimeStr = `วันที่พิมพ์: ${now.getDate()} ${thMonthsFull[now.getMonth()]} ${now.getFullYear() + 543} เวลา ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} น.`;
         
-        const reportTitle = currentActiveSheet === 'general' ? 'รายงานทะเบียนรับใบลาป่วย / ลากิจ / ยกเลิกวันลา สวพ.' : 'รายงานทะเบียนรับใบลาพักผ่อนพนักงาน สวพ.';
+        const reportTitle = currentActiveSheet === 'general' ? 'รายงานทะเบียนรับใบลาป่วย / ลากิจ / ยกเลิกวันลา สวพ.' : 'รายงานทะเบียนรับใบลาพักผ่อนพนักงาน';
         const filePrefix = currentActiveSheet === 'general' ? 'รายงานทะเบียนใบลาทั่วไป' : 'รายงานทะเบียนใบลาพักผ่อน';
 
         let rowsHtml = "";
