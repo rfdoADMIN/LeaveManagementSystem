@@ -340,7 +340,7 @@
                 if (result.status === "success") {
                     localStorage.setItem('loggedInUser', result.name || usernameInput);
                     localStorage.setItem('loggedInEmpId', result.empId || usernameInput);
-                    window.location.href = 'index.html';
+                    window.location.href = 'Leave.html';
                 } else {
                     showFormError(result.message || "รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง");
                 }
