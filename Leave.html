@@ -33,7 +33,7 @@
             --badge-vacation-text: #2b6cb0;
             --badge-vacation-border: #bee3f8;
             --shadow-premium: 0 12px 40px rgba(79, 122, 104, 0.06);
-            --shadow-tooltip: 0 20px 45px rgba(51, 65, 59, 0.18);
+            --shadow-tooltip: 0 20px 45px rgba(51, 65, 59, 0.25);
             --radius-main: 20px;
             --radius-sub: 12px;
         }
@@ -236,29 +236,78 @@
         .form-group input.duplicate-error { border-color: var(--error-color) !important; background-color: #fdf4f4 !important; color: var(--error-color); }
         .error-msg-text { color: var(--error-color); font-size: 12px; margin-top: 5px; display: none; font-weight: 600; }
         
-        .half-day-flex-box {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .halfday-card {
             background: #fbfdfc;
             border: 1.5px solid var(--glass-border);
-            padding: 8px 15px;
-            border-radius: 10px;
-            height: 48px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            transition: border-color 0.2s ease, background 0.2s ease;
         }
-        .checkbox-row {
-            display: flex; align-items: center; gap: 8px; cursor: pointer;
-            font-size: 13.5px; font-weight: 600; color: var(--text-dark);
-            white-space: nowrap; margin: 0;
+        .halfday-card.is-checked {
+            border-color: var(--color-mint);
+            background: var(--color-mint-soft);
         }
-        .checkbox-row input { width: 18px; height: 18px; accent-color: var(--color-primary); cursor: pointer; }
+        .halfday-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .halfday-toggle-text { display: flex; flex-direction: column; gap: 2px; }
+        .halfday-toggle-title { font-size: 13.5px; font-weight: 600; color: var(--text-dark); }
+        .halfday-toggle-sub { font-size: 11.5px; color: var(--text-muted); font-weight: 300; }
+        .switch-toggle {
+            position: relative;
+            width: 40px; height: 22px;
+            flex-shrink: 0;
+            display: inline-block;
+        }
+        .switch-toggle input {
+            position: absolute; opacity: 0; width: 0; height: 0;
+        }
+        .switch-slider {
+            position: absolute; inset: 0;
+            background: #d7e3dc;
+            border-radius: 22px;
+            transition: background 0.2s ease;
+        }
+        .switch-slider::before {
+            content: "";
+            position: absolute;
+            width: 16px; height: 16px;
+            left: 3px; top: 3px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .switch-toggle input:checked ~ .switch-slider {
+            background: var(--color-primary);
+        }
+        .switch-toggle input:checked ~ .switch-slider::before {
+            transform: translateX(18px);
+        }
+        .halfday-period-wrap {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.25s ease;
+        }
+        .halfday-period-wrap.is-open {
+            max-height: 60px;
+            opacity: 1;
+            margin-top: 12px;
+        }
         .half-day-select-inner {
-            flex-grow: 1;
-            padding: 4px 10px !important;
+            width: 100%;
+            padding: 9px 12px !important;
             font-size: 13.5px !important;
-            height: 32px;
+            height: 40px;
             border: 1px solid var(--glass-border) !important;
-            border-radius: 6px !important;
+            border-radius: 8px !important;
+            background: #ffffff;
         }
 
         .form-actions-wrapper { display: flex; justify-content: flex-end; gap: 12px; margin-top: 6px; }
@@ -286,22 +335,22 @@
             transition: all 0.2s;
         }
         .btn-solid-primary:hover { background: var(--color-primary-deep); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(79,122,104,0.2); }
-        .btn-solid-primary:disabled { background: #cddcd4; cursor: not-allowed; transform: none; box-shadow: none; }
         
         .name-input-group { display: flex; gap: 10px; width: 100%; }
         .name-prefix-select { width: 155px !important; flex-shrink: 0; }
         .custom-prefix-input { width: 120px !important; flex-shrink: 0; display: none; }
         .name-fullname-input { flex-grow: 1; }
 
-        .table-responsive-box { width: 100%; overflow-x: visible; border-radius: var(--radius-sub); border: 1px solid var(--glass-border); }
-        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 1000px; background: #ffffff; }
+        .table-responsive-box { width: 100%; overflow-x: auto; border-radius: var(--radius-sub); border: 1px solid var(--glass-border); }
+        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 1160px; background: #ffffff; table-layout: auto; }
         th {
-            padding: 16px 16px;
+            padding: 16px 14px;
             font-size: 12.5px;
             font-weight: 700;
             color: var(--text-muted);
             background: #f7faf8;
             border-bottom: 1px solid var(--glass-border);
+            white-space: nowrap;
         }
         tbody tr { border-bottom: 1px solid #f0f5f1; transition: background-color 0.15s; }
         tbody tr:hover { background-color: #f9fcfa; }
@@ -309,15 +358,172 @@
         tbody tr.row-cancel-highlight { background-color: #fdf2f2 !important; }
         tbody tr.row-cancel-highlight td { color: #c45a5a !important; }
         tbody tr.row-cancel-highlight td.cell-reg { color: #b53e3e !important; }
-        tbody tr.row-cancel-highlight .action-link { color: #b53e3e !important; }
-        tbody tr.row-cancel-highlight .action-link:hover { color: #872626 !important; }
-        tbody tr.row-cancel-highlight .action-link.delete-btn { color: #d97878 !important; }
-        tbody tr.row-cancel-highlight .action-link.delete-btn:hover { color: #b85353 !important; }
-        tbody tr.row-cancel-highlight .history-trigger-text { color: #b53e3e !important; }
         
-        tbody td { padding: 16px; font-size: 13.5px; color: var(--text-dark); vertical-align: middle; }
+        tbody td { padding: 14px; font-size: 13.5px; color: var(--text-dark); vertical-align: middle; }
         tbody td.cell-reg { font-weight: 700; color: var(--color-primary-deep); }
         
+        td.cell-employee-name, th.col-employee-name {
+            min-width: 230px;
+            white-space: nowrap;
+        }
+        td.cell-date-range {
+            white-space: nowrap;
+            font-size: 12.5px;
+            min-width: 150px;
+        }
+        .halfday-tag {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        .emp-name-wrapper { display: flex; align-items: center; gap: 6px; }
+        .edit-history-indicator {
+            color: var(--text-muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: #f0f4f2;
+            transition: background 0.15s ease, color 0.15s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .edit-history-indicator svg { width: 12px; height: 12px; display: block; }
+        .edit-history-indicator:hover,
+        .edit-history-indicator.is-active {
+            background: var(--color-mint);
+            color: var(--color-primary-deep);
+        }
+        .history-tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .history-tooltip-box {
+            position: fixed;
+            background: #ffffff;
+            color: var(--text-dark);
+            padding: 16px;
+            border-radius: var(--radius-sub);
+            width: 320px;
+            max-width: calc(100vw - 24px);
+            max-height: 320px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-tooltip);
+            border: 1px solid var(--glass-border);
+            z-index: 99999;
+            text-align: left;
+            white-space: normal;
+            line-height: 1.4;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(4px);
+            transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s;
+        }
+        .history-tooltip-box.is-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        .history-tooltip-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-primary-deep);
+            border-bottom: 1px dashed var(--glass-border);
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .history-tooltip-title svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .history-log-item {
+            font-size: 12px;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f3f7f5;
+        }
+        .history-log-item:last-child {
+            margin-bottom: 0; padding-bottom: 0; border-bottom: none;
+        }
+        .history-log-version {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .history-log-meta {
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .history-log-meta svg { width: 11px; height: 11px; flex-shrink: 0; opacity: 0.8; }
+
+        .delete-history-btn-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        .btn-delete-log-trigger {
+            background: transparent;
+            border: 1px dashed var(--error-color);
+            color: var(--error-color);
+            padding: 6px 14px;
+            font-size: 12.5px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-delete-log-trigger svg { width: 13px; height: 13px; flex-shrink: 0; }
+        .btn-delete-log-trigger:hover {
+            background: var(--error-bg-light);
+        }
+        .delete-log-row-icon {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: var(--error-bg-light);
+            color: var(--error-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .delete-log-row-icon svg { width: 11px; height: 11px; }
+        .delete-logs-panel {
+            display: none;
+            background: #fffafa;
+            border: 1px dashed #fbc4c4;
+            border-radius: var(--radius-sub);
+            padding: 20px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+        .delete-log-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: #ffffff;
+            border: 1px solid #fcdad4;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .delete-log-row:last-child { margin-bottom: 0; }
+
         .badge-type { display: inline-block; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; text-align: center; white-space: nowrap; }
         .badge-sick { background: var(--badge-sick-bg); color: var(--badge-sick-text); border: 1px solid var(--badge-sick-border); }
         .badge-personal { background: var(--badge-personal-bg); color: var(--badge-personal-text); border: 1px solid var(--badge-personal-border); }
@@ -337,34 +543,7 @@
         .action-link.delete-btn:hover { color: #b85353; }
         
         .creator-stamp-tag { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 400; font-style: italic; }
-        .history-container { position: relative; display: inline-block; margin-top: 4px; }
-        .history-trigger-text { font-size: 11.5px; color: var(--text-muted); cursor: pointer; text-decoration: underline dotted; display: inline-block; }
-        .history-tooltip-box {
-            display: none; position: absolute; right: 0px; top: 24px; background: #ffffff; color: var(--text-dark); padding: 20px;
-            border-radius: var(--radius-sub); width: 380px; box-shadow: var(--shadow-tooltip); border: 1px solid var(--glass-border); z-index: 9999;
-            text-align: left; animation: floatingFade 0.2s ease-out;
-        }
-        @keyframes floatingFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .history-container:hover .history-tooltip-box { display: block !important; }
-        .history-header { font-size: 14.5px; font-weight: 700; color: var(--color-primary-deep); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px dashed var(--glass-border); display: flex; align-items: center; gap: 6px; }
-        .history-timeline-flow { max-height: 250px; overflow-y: auto; padding-right: 4px; }
-        .history-card-item { background: #fbfdfc; border: 1px solid var(--glass-border); border-left: 4px solid var(--color-primary); padding: 12px; margin-bottom: 10px; border-radius: 6px; }
-        .history-card-item:last-child { margin-bottom: 0; }
-        .history-card-title { font-weight: 700; font-size: 12.5px; color: var(--text-dark); }
-        .history-card-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
-        .history-card-meta b { color: var(--color-primary-deep); }
-        .history-change-log { background: #f4faf7; padding: 6px 10px; border-radius: 6px; margin-top: 6px; font-size: 11.5px; border: 1px solid #e3ede7; }
-        .history-change-item { margin-bottom: 4px; }
-        .history-change-item:last-child { margin-bottom: 0; }
-        
-        .deleted-log-card { background: #fffcfc; border: 1px solid #fbc4c4; border-left: 4px solid var(--error-color); padding: 14px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(217,120,120,0.06); }
-        .deleted-log-card:last-child { margin-bottom: 0; }
-        .deleted-log-title { font-weight: 700; font-size: 13.5px; color: #b53e3e; display: flex; justify-content: space-between; }
-        .deleted-log-reg-badge { background: #b53e3e; color: #ffffff; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; }
-        .deleted-log-meta { font-size: 12.5px; color: var(--text-dark); margin-top: 4px; line-height: 1.5; }
-        .deleted-log-meta b { color: #222; font-weight: 600; }
-        .deleted-log-time { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; border-top: 1px dashed #fcdad4; padding-top: 4px; text-align: right; }
-        
+
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(51, 65, 59, 0.28); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 10000; padding: 15px; }
         .modal-card { background: #ffffff; padding: 32px; border-radius: var(--radius-main); width: 100%; max-width: 500px; box-shadow: 0 25px 55px rgba(0,0,0,0.14); border: 1px solid var(--glass-border); }
         .modal-card h3 { font-size: 18.5px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
@@ -375,7 +554,6 @@
             .stat-row { grid-template-columns: repeat(2, 1fr); }
             .form-grid { grid-template-columns: repeat(2, 1fr); }
             .form-group.span-2, .form-group.span-4 { grid-column: span 2; }
-            .table-responsive-box { overflow-x: auto; }
         }
         @media (max-width: 640px) {
             body { padding: 20px 12px 50px; }
@@ -390,7 +568,6 @@
             .name-prefix-select, .custom-prefix-input { width: 100% !important; }
             .form-actions-wrapper { flex-direction: column-reverse; width: 100%; gap: 10px; }
             .form-actions-wrapper button { width: 100%; padding: 14px; }
-            .history-tooltip-box { position: fixed; left: 20px; right: 20px; width: auto; top: 50% !important; transform: translateY(50%); }
         }
     </style>
 </head>
@@ -426,8 +603,8 @@
             <input type="hidden" id="active-edit-row-id" value="">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>เลขทะเบียนรับ</label>
-                    <input type="number" id="input-reg-num" min="1" required oninput="validateDuplicateReg()">
+                    <label>เลขทะเบียนรับ <span style="font-weight:400; color:var(--text-muted); font-size:11px;">(รันอัตโนมัติ)</span></label>
+                    <input type="number" id="input-reg-num" min="1" required readonly style="background:#f4f7f5; color:var(--text-muted); cursor:not-allowed;">
                     <div class="error-msg-text" id="reg-error-msg">เลขทะเบียนนี้ถูกใช้งานไปแล้ว</div>
                 </div>
                 <div class="form-group">
@@ -445,7 +622,7 @@
                             <option value="CUSTOM_OTHER">อื่นๆ (ระบุเอง)</option>
                         </select>
                         <input type="text" id="input-custom-prefix" class="custom-prefix-input" placeholder="ระบุคำนำหน้า...">
-                        <input type="text" id="input-emp-name" class="name-fullname-input" list="emp-datalist" required placeholder="พิมพ์ชื่อ-นามสกุลพนักงาน...">
+                        <input type="text" id="input-emp-name" class="name-fullname-input" list="emp-datalist" required placeholder="พิมพ์ชื่อ-นามสกุลพนักงาน..." oninput="handleEmpNameAutofill()">
                     </div>
                 </div>
                 <div class="form-group">
@@ -469,15 +646,23 @@
                 
                 <div class="form-group span-2">
                     <label>เงื่อนไขเวลาทำงาน</label>
-                    <div class="half-day-flex-box">
-                        <label class="checkbox-row">
-                            <input type="checkbox" id="check-half-day" onchange="toggleHalfDayMenu()">
-                            <span>ยื่นขอลาครึ่งวัน</span>
+                    <div class="halfday-card" id="halfday-card">
+                        <label class="halfday-toggle-row">
+                            <div class="halfday-toggle-text">
+                                <span class="halfday-toggle-title">ยื่นขอลาครึ่งวัน</span>
+                                <span class="halfday-toggle-sub">เปิดสวิตช์หากต้องการลาเพียงครึ่งวันทำการ</span>
+                            </div>
+                            <span class="switch-toggle">
+                                <input type="checkbox" id="check-half-day" onchange="toggleHalfDayMenu()">
+                                <span class="switch-slider"></span>
+                            </span>
                         </label>
-                        <select id="select-half-time" class="half-day-select-inner" style="display: none;" onchange="execDaysCalc()">
-                            <option value="08.30 - 12.00 น.">ช่วงเช้า (08.30 - 12.00 น.)</option>
-                            <option value="13.00 - 16.30 น.">ช่วงบ่าย (13.00 - 16.30 น.)</option>
-                        </select>
+                        <div id="halfday-period-wrap" class="halfday-period-wrap">
+                            <select id="select-half-time" class="half-day-select-inner" onchange="execDaysCalc()">
+                                <option value="08.30 - 12.00 น.">ช่วงเช้า (08.30 - 12.00 น.)</option>
+                                <option value="13.00 - 16.30 น.">ช่วงบ่าย (13.00 - 16.30 น.)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
@@ -538,35 +723,39 @@
         </div>
         
         <div class="glass-panel">
-            <div class="panel-head"><h2 id="form-heading-title">บันทึกข้อมูลใบลาป่วย/ลากิจ)</h2></div>
+            <div class="panel-head"><h2 id="form-heading-title">บันทึกข้อมูลใบลาป่วย/ลากิจ</h2></div>
             <div id="form-general-placeholder"></div>
         </div>
 
         <div class="glass-panel">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
                 <h2>ทำเนียบประวัติข้อมูลทะเบียนใบลาป่วย/ลากิจ</h2>
-                <div class="history-container" id="deleted-history-master" style="display:none;">
-                    <span class="history-trigger-text" style="color:var(--error-color); font-weight:700; font-size:13px;" onclick="toggleDeletedTooltip(event, 'general')">ดูประวัติการลบรายการ 📋</span>
-                    <div class="history-tooltip-box" id="deleted-master-tooltip" style="right:0; width:420px; display:none;">
-                        <div class="history-header" style="color:var(--error-color);">ประวัติการลบทิ้งข้อมูลในระบบ</div>
-                        <div class="history-timeline-flow" id="deleted-logs-container"></div>
-                    </div>
+                <div class="delete-history-btn-wrapper">
+                    <button class="btn-delete-log-trigger" onclick="toggleDeleteLogPanel('general')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> เปิด/ปิด ประวัติการลบรายการ</button>
                 </div>
             </div>
+            
+            <div id="delete-log-panel-general" class="delete-logs-panel" style="display: block;">
+                <h4 style="font-size:14px; margin-bottom:10px; color:var(--error-color);">ประวัติการลบทิ้งข้อมูลใบลาป่วย/ลากิจ</h4>
+                <div id="delete-logs-container-general" style="max-height: 200px; overflow-y: auto;">
+                    <p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>
+                </div>
+            </div>
+
             <div class="table-responsive-box">
                 <table id="mainLeaveTable">
                     <thead>
                         <tr>
                             <th style="width: 85px;">เลขทะเบียน</th>
                             <th style="width: 105px;">วันที่รายงาน</th>
-                            <th>ชื่อผู้ยื่นใบลา</th>
+                            <th class="col-employee-name">ชื่อผู้ยื่นใบลา</th>
                             <th style="width: 85px;">เรียนถึง</th>
                             <th style="width: 120px;">ประเภทลา</th>
                             <th>ช่วงระยะเวลาวันลา</th>
                             <th style="width: 95px;">จำนวนวัน</th>
                             <th style="width: 85px;">หน่วยงาน</th>
                             <th>หมายเหตุ</th>
-                            <th style="text-align:right; width: 220px;">การจัดการระบบ</th>
+                            <th style="text-align:right; width: 160px;">การจัดการระบบ</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -593,28 +782,32 @@
         <div class="glass-panel">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
                 <h2>ทะเบียนรับใบลาพักผ่อน</h2>
-                <div class="history-container" id="deleted-history-master-vacation" style="display:none;">
-                    <span class="history-trigger-text" style="color:var(--error-color); font-weight:700; font-size:13px;" onclick="toggleDeletedTooltip(event, 'vacation')">ดูประวัติการลบรายการ 📋</span>
-                    <div class="history-tooltip-box" id="deleted-master-tooltip-vacation" style="right:0; width:420px; display:none;">
-                        <div class="history-header" style="color:var(--error-color);">ประวัติการลบทิ้งข้อมูลในระบบ (ลาพักผ่อน)</div>
-                        <div class="history-timeline-flow" id="deleted-logs-container-vacation"></div>
-                    </div>
+                <div class="delete-history-btn-wrapper">
+                    <button class="btn-delete-log-trigger" onclick="toggleDeleteLogPanel('vacation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> เปิด/ปิด ประวัติการลบรายการ</button>
                 </div>
             </div>
+
+            <div id="delete-log-panel-vacation" class="delete-logs-panel" style="display: block;">
+                <h4 style="font-size:14px; margin-bottom:10px; color:var(--error-color);">ประวัติการลบทิ้งข้อมูลใบลาพักผ่อน</h4>
+                <div id="delete-logs-container-vacation" style="max-height: 200px; overflow-y: auto;">
+                    <p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>
+                </div>
+            </div>
+
             <div class="table-responsive-box">
                 <table id="vacationLeaveTable">
                     <thead>
                         <tr>
                             <th style="width: 85px;">เลขทะเบียน</th>
                             <th style="width: 105px;">วันที่รายงาน</th>
-                            <th>ชื่อผู้ยื่นใบลา</th>
+                            <th class="col-employee-name">ชื่อผู้ยื่นใบลา</th>
                             <th style="width: 85px;">เรียนถึง</th>
                             <th style="width: 120px;">ประเภทลา</th>
                             <th>ช่วงระยะเวลาวันลา</th>
                             <th style="width: 95px;">จำนวนวัน</th>
                             <th style="width: 85px;">หน่วยงาน</th>
                             <th>หมายเหตุ</th>
-                            <th style="text-align:right; width: 220px;">การจัดการระบบ</th>
+                            <th style="text-align:right; width: 160px;">การจัดการระบบ</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -622,10 +815,9 @@
             </div>
         </div>
     </div>
-
-    <div id="blanket-popup-context" style="display:none;"></div>
-    <datalist id="emp-datalist"></datalist>
 </div>
+
+<div id="globalHistoryTooltip" class="history-tooltip-box"></div>
 
 <div class="modal-overlay" id="downloadModal">
     <div class="modal-card">
@@ -649,721 +841,641 @@
 </div>
 
 <script>
-    let savedNamesMap = {};
-    let globalDeletedLogs = [];
-    let globalDeletedLogsVacation = [];
+    const SUPABASE_URL = 'https://rxqfmhrxoepjdsmmnqhk.supabase.co';
+    const SUPABASE_KEY_VALUE = "sb_publishable_lMMLp3mTrIiSm1Om-HdQxw_oOrHub8g"; 
     let currentActiveSheet = 'general';
-    
-    let nextRegGeneral = 1;
-    let nextRegVacation = 1;
+    let globalLeaveRecords = [];
+    let globalEditLogs = [];
+    let globalDeleteLogs = [];
 
-    window.onload = function () {
-        const loggedInName = localStorage.getItem('loggedInUser') || "ผู้ดูแลระบบ";
+    const ICON_CALENDAR = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
+    const ICON_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`;
+    const ICON_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>`;
+
+    function buildHistoryTooltipHtml(matchLogs) {
+        const sorted = [...matchLogs].sort((a, b) => (a.edit_version || 0) - (b.edit_version || 0));
+        const items = sorted.map(l => `
+            <div class="history-log-item">
+                <span class="history-log-version">ครั้งที่ ${l.edit_version} · โดย ${l.edited_by || 'ไม่ระบุ'}</span><br>
+                <span style="color:#2c3e50;">${l.change_details || '-'}</span>
+                <div class="history-log-meta">${ICON_CLOCK} ${formatDateTime(l.edited_at)}</div>
+            </div>
+        `).join('');
+        return `
+            <div class="history-tooltip-title">${ICON_CLOCK} ประวัติแก้ไขข้อมูล (${sorted.length} ครั้ง)</div>
+            ${items}
+        `;
+    }
+
+    function positionHistoryTooltip(icon, box) {
+        const iconRect = icon.getBoundingClientRect();
+        const boxRect = box.getBoundingClientRect();
+        let left = iconRect.right + 8;
+        let top = iconRect.top - 8;
+        if (left + boxRect.width > window.innerWidth - 12) {
+            left = iconRect.left - boxRect.width - 8;
+        }
+        if (left < 12) left = 12;
+        if (top + boxRect.height > window.innerHeight - 12) {
+            top = window.innerHeight - boxRect.height - 12;
+        }
+        if (top < 12) top = 12;
+        box.style.left = left + 'px';
+        box.style.top = top + 'px';
+    }
+
+    function initHistoryTooltipDelegation() {
+        const tooltip = document.getElementById('globalHistoryTooltip');
+        if (!tooltip) return;
+        let hideTimer = null;
+
+        document.addEventListener('mouseover', (e) => {
+            const icon = e.target.closest('.edit-history-indicator');
+            if (!icon) return;
+            clearTimeout(hideTimer);
+            const recId = icon.getAttribute('data-record-id');
+            const matchLogs = globalEditLogs.filter(l => l.record_id === recId);
+            if (matchLogs.length === 0) return;
+            document.querySelectorAll('.edit-history-indicator.is-active').forEach(el => el.classList.remove('is-active'));
+            icon.classList.add('is-active');
+            tooltip.innerHTML = buildHistoryTooltipHtml(matchLogs);
+            tooltip.classList.add('is-visible');
+            positionHistoryTooltip(icon, tooltip);
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            const icon = e.target.closest('.edit-history-indicator');
+            if (!icon) return;
+            hideTimer = setTimeout(() => {
+                tooltip.classList.remove('is-visible');
+                icon.classList.remove('is-active');
+            }, 80);
+        });
+
+        window.addEventListener('scroll', () => tooltip.classList.remove('is-visible'), true);
+        window.addEventListener('resize', () => tooltip.classList.remove('is-visible'));
+    }
+
+    window.onload = async function () {
+        const loggedInName = localStorage.getItem('loggedInUser');
+        if (!loggedInName) {
+            window.location.href = 'index.html';
+            return;
+        }
+
         document.getElementById('current-user-display').innerText = loggedInName;
         document.getElementById('user-avatar-initial').innerText = loggedInName.trim().charAt(0) || '·';
         
+        initHistoryTooltipDelegation();
         switchSheet('general');
-        
-        document.addEventListener('click', function(e) {
-            const boxes = ['deleted-master-tooltip', 'deleted-master-tooltip-vacation'];
-            boxes.forEach(id => {
-                const box = document.getElementById(id);
-                if(box && !box.contains(e.target) && !e.target.classList.contains('history-trigger-text')) {
-                    box.style.display = "none";
-                }
-            });
-        });
+        await fetchAllDataFromSupabase();
     };
 
     function handleLogoutRedirect() {
-        if (confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
-            localStorage.removeItem('loggedInUser');
-            window.location.href = "index.html";
+        if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    }
+
+    async function fetchAllDataFromSupabase() {
+        try {
+            const resRecords = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?order=reg_num.asc`, {
+                method: "GET", headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}` }
+            });
+            if (resRecords.ok) globalLeaveRecords = await resRecords.json();
+
+            const resEditLogs = await fetch(`${SUPABASE_URL}/rest/v1/leave_edit_logs?order=edited_at.desc`, {
+                method: "GET", headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}` }
+            });
+            if (resEditLogs.ok) globalEditLogs = await resEditLogs.json();
+
+            await fetchDeleteLogs();
+
+            renderTableData();
+            updateStatCards();
+            calculateNextRegNumbers();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function fetchDeleteLogs() {
+        try {
+            const resDeleteLogs = await fetch(`${SUPABASE_URL}/rest/v1/leave_delete_logs?order=deleted_at.desc`, {
+                method: "GET", headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}` }
+            });
+            if (resDeleteLogs.ok) {
+                globalDeleteLogs = await resDeleteLogs.json();
+                renderDeleteLogs();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function calculateNextRegNumbers() {
+        let maxGen = 0, maxVac = 0;
+        globalLeaveRecords.forEach(r => {
+            if (r.sheet_type === 'general' && r.reg_num > maxGen) maxGen = r.reg_num;
+            if (r.sheet_type === 'vacation' && r.reg_num > maxVac) maxVac = r.reg_num;
+        });
+        const nextReg = (currentActiveSheet === 'general') ? maxGen + 1 : maxVac + 1;
+        document.getElementById('global-next-reg').value = nextReg;
+        if (!document.getElementById('active-edit-row-id').value) {
+            document.getElementById('input-reg-num').value = nextReg;
+        }
+    }
+
+    function formatDaysDisplay(daysNum) {
+        if (daysNum === 0.5) return "1/2 วัน";
+        if (Number.isInteger(daysNum)) return `${daysNum} วัน`;
+        return `${Math.floor(daysNum)} 1/2 วัน`;
+    }
+
+    function formatDateTime(isoString) {
+        if(!isoString) return '-';
+        const d = new Date(isoString);
+        return d.toLocaleDateString('th-TH', {day:'2-digit', month:'2-digit', year:'2-digit'}) + ' เวลา ' + d.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) + ' น.';
+    }
+
+    function renderTableData() {
+        const generalBody = document.querySelector('#mainLeaveTable tbody');
+        const vacationBody = document.querySelector('#vacationLeaveTable tbody');
+        generalBody.innerHTML = '';
+        vacationBody.innerHTML = '';
+        const employeeNames = new Set();
+
+        globalLeaveRecords.forEach(record => {
+            if (record.emp_name) employeeNames.add(record.emp_name);
+            const isCancel = record.leave_type === 'ยกเลิกวันลา';
+            const rowClass = isCancel ? 'class="row-cancel-highlight"' : '';
+            const badgeClass = getBadgeClass(record.leave_type);
+            const deptClass = getDeptClass(record.action_dept);
+            
+            let dateStr = record.start_date === record.end_date ? 
+                formatThaiDate(record.start_date) : 
+                formatThaiDateRange(record.start_date, record.end_date);
+            if (record.half_day) dateStr += `<span class="halfday-tag">ครึ่งวัน (${record.half_time})</span>`;
+
+            const remarkDisplay = record.remark || '-';
+
+            const matchLogs = globalEditLogs.filter(log => log.record_id === record.id);
+            let historyHtmlIcon = '';
+            if (matchLogs.length > 0) {
+                historyHtmlIcon = `
+                    <span class="edit-history-indicator" data-record-id="${record.id}" title="ประวัติแก้ไขข้อมูล ${matchLogs.length} ครั้ง">${ICON_CLOCK}</span>
+                `;
+            }
+
+            const trHtml = `
+                <tr ${rowClass}>
+                    <td class="cell-reg">${record.reg_num}</td>
+                    <td>${formatThaiDate(record.doc_date)}</td>
+                    <td class="cell-employee-name">
+                        <div class="emp-name-wrapper">
+                            <b>${record.emp_prefix || ''}${record.emp_name}</b>
+                            ${historyHtmlIcon}
+                        </div>
+                        <span class="creator-stamp-tag">บันทึกโดย: ${record.created_by || 'ไม่ระบุ'}</span>
+                    </td>
+                    <td>${record.sup_name || 'ผอ.สวพ'}</td>
+                    <td><span class="badge-type ${badgeClass}">${record.leave_type}</span></td>
+                    <td class="cell-date-range">${dateStr}</td>
+                    <td><b>${formatDaysDisplay(record.total_days)}</b></td>
+                    <td><span class="badge-dept ${deptClass}">${record.action_dept || 'สอก.'}</span></td>
+                    <td>${remarkDisplay}</td>
+                    <td style="text-align:right;">
+                        <button class="action-link" onclick="enterEditMode('${record.id}')">แก้ไข</button>
+                        <button class="action-link delete-btn" onclick="deleteRecord('${record.id}')">ลบ</button>
+                    </td>
+                </tr>
+            `;
+
+            if (record.sheet_type === 'vacation') vacationBody.innerHTML += trHtml;
+            else generalBody.innerHTML += trHtml;
+        });
+
+        const datalist = document.getElementById('emp-datalist');
+        datalist.innerHTML = '';
+        employeeNames.forEach(name => datalist.innerHTML += `<option value="${name}"></option>`);
+    }
+
+    function renderDeleteLogs() {
+        const containerGen = document.getElementById('delete-logs-container-general');
+        const containerVac = document.getElementById('delete-logs-container-vacation');
+        
+        const logsGen = globalDeleteLogs.filter(l => l.sheet_type === 'general');
+        const logsVac = globalDeleteLogs.filter(l => l.sheet_type === 'vacation');
+
+        if(logsGen.length === 0) {
+            containerGen.innerHTML = `<p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>`;
+        } else {
+            containerGen.innerHTML = logsGen.map(l => `
+                <div class="delete-log-row">
+                    <div style="display:flex; align-items:center; gap:10px;"><span class="delete-log-row-icon">${ICON_TRASH}</span> <span><b>ทะเบียนเลขที่ ${l.reg_num}</b> ของคุณ <b>${l.emp_name || '-'}</b> (${l.leave_type})</span></div>
+                    <div style="color:var(--text-muted); font-size:11.5px; text-align:right;">ลบโดย: <b>${l.deleted_by || 'ไม่ระบุ'}</b><br>${formatDateTime(l.deleted_at)}</div>
+                </div>
+            `).join('');
+        }
+
+        if(logsVac.length === 0) {
+            containerVac.innerHTML = `<p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>`;
+        } else {
+            containerVac.innerHTML = logsVac.map(l => `
+                <div class="delete-log-row">
+                    <div style="display:flex; align-items:center; gap:10px;"><span class="delete-log-row-icon">${ICON_TRASH}</span> <span><b>ทะเบียนเลขที่ ${l.reg_num}</b> ของคุณ <b>${l.emp_name || '-'}</b> (ลาพักผ่อน)</span></div>
+                    <div style="color:var(--text-muted); font-size:11.5px; text-align:right;">ลบโดย: <b>${l.deleted_by || 'ไม่ระบุ'}</b><br>${formatDateTime(l.deleted_at)}</div>
+                </div>
+            `).join('');
+        }
+    }
+
+    function toggleDeleteLogPanel(type) {
+        const panel = document.getElementById(`delete-log-panel-${type}`);
+        panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+    }
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        const editId = document.getElementById('active-edit-row-id').value;
+        const regNum = parseInt(document.getElementById('input-reg-num').value);
+        if (validateDuplicateReg(editId)) { alert('เลขทะเบียนนี้ถูกใช้งานไปแล้วในระบบ'); return; }
+
+        const prefixSelect = document.getElementById('input-emp-prefix').value;
+        const emp_prefix = prefixSelect === 'CUSTOM_OTHER' ? document.getElementById('input-custom-prefix').value : prefixSelect;
+        
+        let finalDays = 0;
+        const totalDaysString = document.getElementById('input-total-days').value;
+        if (totalDaysString.includes("1/2")) {
+            const parts = totalDaysString.split(" ");
+            finalDays = parts.length === 2 ? parseFloat(parts[0]) + 0.5 : 0.5;
+        } else {
+            finalDays = parseFloat(totalDaysString) || 0;
+        }
+
+        const currentUser = localStorage.getItem('loggedInUser') || "ผู้ดูแลระบบ";
+
+        const payload = {
+            reg_num: regNum,
+            doc_date: document.getElementById('input-doc-date').value,
+            emp_prefix: emp_prefix,
+            emp_name: document.getElementById('input-emp-name').value,
+            sup_name: document.getElementById('input-sup-name').value,
+            leave_type: document.getElementById('input-leave-type').value,
+            start_date: document.getElementById('input-start-date').value,
+            end_date: document.getElementById('input-end-date').value,
+            half_day: document.getElementById('check-half-day').checked,
+            half_time: document.getElementById('check-half-day').checked ? document.getElementById('select-half-time').value : null,
+            total_days: finalDays,
+            action_dept: document.getElementById('input-action-dept').value,
+            remark: document.getElementById('input-remark').value,
+            sheet_type: currentActiveSheet,
+            created_by: currentUser
+        };
+
+        try {
+            let response;
+            if (editId) {
+                const oldRec = globalLeaveRecords.find(r => r.id === editId);
+                const currentVersion = globalEditLogs.filter(l => l.record_id === editId).length + 1;
+                let changes = [];
+                if(oldRec.reg_num !== payload.reg_num) changes.push(`เลขทะเบียน (${oldRec.reg_num}➡️${payload.reg_num})`);
+                if(oldRec.leave_type !== payload.leave_type) changes.push(`ประเภทลา (${oldRec.leave_type}➡️${payload.leave_type})`);
+                if(oldRec.total_days !== payload.total_days) changes.push(`จำนวนวัน (${oldRec.total_days}➡️${payload.total_days})`);
+                if(oldRec.emp_name !== payload.emp_name) changes.push(`เปลี่ยนชื่อพนักงาน`);
+                if(changes.length === 0) changes.push('แก้ไขรายละเอียดปลีกย่อย');
+
+                await fetch(`${SUPABASE_URL}/rest/v1/leave_edit_logs`, {
+                    method: "POST",
+                    headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({ record_id: editId, edited_by: currentUser, edit_version: currentVersion, change_details: changes.join(', ') })
+                });
+
+                response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?id=eq.${editId}`, {
+                    method: "PATCH",
+                    headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+            } else {
+                response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records`, {
+                    method: "POST",
+                    headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            if (response.ok) { exitEditMode(); await fetchAllDataFromSupabase(); } 
+            else { alert('ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง'); }
+        } catch (error) { console.error(error); }
+    }
+
+    function enterEditMode(id) {
+        const record = globalLeaveRecords.find(r => r.id === id);
+        if (!record) return;
+
+        document.getElementById('active-edit-row-id').value = record.id;
+        document.getElementById('input-reg-num').value = record.reg_num;
+        document.getElementById('input-doc-date').value = record.doc_date;
+        
+        const standardPrefixes = ['นาย', 'นาง', 'นางสาว', 'ว่าที่ร้อยตรีหญิง'];
+        if (standardPrefixes.includes(record.emp_prefix)) {
+            document.getElementById('input-emp-prefix').value = record.emp_prefix;
+            document.getElementById('input-custom-prefix').style.display = 'none';
+        } else {
+            document.getElementById('input-emp-prefix').value = 'CUSTOM_OTHER';
+            document.getElementById('input-custom-prefix').style.display = 'block';
+            document.getElementById('input-custom-prefix').value = record.emp_prefix || '';
+        }
+
+        document.getElementById('input-emp-name').value = record.emp_name;
+        document.getElementById('input-leave-type').value = record.leave_type;
+        document.getElementById('input-start-date').value = record.start_date;
+        document.getElementById('input-end-date').value = record.end_date;
+        
+        document.getElementById('check-half-day').checked = record.half_day;
+        document.getElementById('halfday-period-wrap').classList.toggle('is-open', !!record.half_day);
+        document.getElementById('halfday-card').classList.toggle('is-checked', !!record.half_day);
+        if (record.half_day) document.getElementById('select-half-time').value = record.half_time || '08.30 - 12.00 น.';
+        
+        document.getElementById('input-total-days').value = formatDaysDisplay(record.total_days);
+        document.getElementById('input-action-dept').value = record.action_dept;
+        document.getElementById('input-remark').value = record.remark || '';
+
+        document.getElementById('btn-cancel-edit-mode').style.display = 'inline-block';
+        document.getElementById('btn-submit-main').innerText = 'อัปเดตข้อมูลเก่า';
+        document.querySelector('.glass-panel h2').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function deleteRecord(id) {
+        const record = globalLeaveRecords.find(r => r.id === id);
+        if (!record) return;
+        if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบรายการทะเบียนเลขที่ ${record.reg_num} ใช่หรือไม่?`)) return;
+
+        const currentUser = localStorage.getItem('loggedInUser') || "ผู้ดูแลระบบ";
+
+        try {
+            const resLog = await fetch(`${SUPABASE_URL}/rest/v1/leave_delete_logs`, {
+                method: "POST",
+                headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json", "Prefer": "return=representation" },
+                body: JSON.stringify({ reg_num: record.reg_num, emp_name: record.emp_name, leave_type: record.leave_type, sheet_type: record.sheet_type, deleted_by: currentUser })
+            });
+
+            if (!resLog.ok) {
+                const errText = await resLog.text();
+                console.error('บันทึกประวัติการลบไม่สำเร็จ:', errText);
+                alert('ไม่สามารถบันทึกประวัติการลบได้ ระบบจึงยกเลิกการลบรายการนี้ไว้ก่อน เพื่อไม่ให้ประวัติการลบขาดหาย\n\nรายละเอียดข้อผิดพลาด: ' + errText);
+                return;
+            }
+
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?id=eq.${id}`, {
+                method: "DELETE", headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}` }
+            });
+
+            if (response.ok) {
+                if (document.getElementById('active-edit-row-id').value === id) exitEditMode();
+                await fetchDeleteLogs();
+                await fetchAllDataFromSupabase();
+            } else { alert('ไม่สามารถลบข้อมูลได้'); }
+        } catch (error) { console.error(error); alert('เกิดข้อผิดพลาดในการลบข้อมูล: ' + error.message); }
+    }
+
+    function exitEditMode() {
+        document.getElementById('active-edit-row-id').value = '';
+        document.getElementById('leaveDataForm').reset();
+        document.getElementById('halfday-period-wrap').classList.remove('is-open');
+        document.getElementById('halfday-card').classList.remove('is-checked');
+        document.getElementById('input-custom-prefix').style.display = 'none';
+        document.getElementById('reg-error-msg').style.display = 'none';
+        document.getElementById('input-reg-num').classList.remove('duplicate-error');
+        document.getElementById('btn-cancel-edit-mode').style.display = 'none';
+        document.getElementById('btn-submit-main').innerText = 'บันทึกข้อมูลเข้าระบบ';
+        calculateNextRegNumbers();
+    }
+
+    function validateDuplicateReg(editId = '') {
+        const regInput = document.getElementById('input-reg-num');
+        const errorMsg = document.getElementById('reg-error-msg');
+        const val = parseInt(regInput.value);
+        if (!val) return false;
+        const isDup = globalLeaveRecords.some(r => r.reg_num === val && r.sheet_type === currentActiveSheet && r.id !== editId);
+        if (isDup) {
+            regInput.classList.add('duplicate-error'); errorMsg.style.display = 'block'; return true;
+        } else {
+            regInput.classList.remove('duplicate-error'); errorMsg.style.display = 'none'; return false;
         }
     }
 
     function switchSheet(sheetName) {
-        exitEditMode();
         currentActiveSheet = sheetName;
-        
         const tabs = document.querySelectorAll('.sheet-tab');
         tabs.forEach(tab => tab.classList.remove('active-sheet'));
         document.querySelectorAll('.sheet-content-panel').forEach(panel => panel.classList.remove('active-panel'));
         
         const formElement = document.getElementById('leaveDataForm');
         const selectType = document.getElementById('input-leave-type');
-
+        
         if (sheetName === 'general') {
             tabs[0].classList.add('active-sheet');
             document.getElementById('sheet-panel-general').classList.add('active-panel');
             document.getElementById('form-general-placeholder').appendChild(formElement);
-            
-            selectType.innerHTML = `
-                <option value="ลาป่วย">ลาป่วย</option>
-                <option value="ลากิจ">ลากิจ</option>
-                <option value="ยกเลิกวันลา">ยกเลิกวันลา</option>
-            `;
-            document.getElementById('global-next-reg').value = nextRegGeneral;
+            selectType.innerHTML = `<option value="ลาป่วย">ลาป่วย</option><option value="ลากิจ">ลากิจ</option><option value="ยกเลิกวันลา">ยกเลิกวันลา</option>`;
         } else if (sheetName === 'vacation') {
             tabs[1].classList.add('active-sheet');
             document.getElementById('sheet-panel-vacation').classList.add('active-panel');
             document.getElementById('form-vacation-placeholder').appendChild(formElement);
-            
-            selectType.innerHTML = `
-                <option value="ลาพักผ่อน" selected>ลาพักผ่อน</option>
-                <option value="ยกเลิกวันลา">ยกเลิกวันลา</option>
-            `;
-            document.getElementById('global-next-reg').value = nextRegVacation;
+            selectType.innerHTML = `<option value="ลาพักผ่อน" selected>ลาพักผ่อน</option><option value="ยกเลิกวันลา">ยกเลิกวันลา</option>`;
         }
-        
-        syncRegNumber();
+        exitEditMode();
         updateStatCards();
-    }
-
-    function handlePrefixChange() {
-        const select = document.getElementById('input-emp-prefix');
-        const customInput = document.getElementById('input-custom-prefix');
-        if (select.value === "CUSTOM_OTHER") {
-            customInput.style.display = "block";
-            customInput.required = true;
-        } else {
-            customInput.style.display = "none";
-            customInput.required = false;
-            customInput.value = "";
-        }
     }
 
     function updateStatCards() {
         if (currentActiveSheet === 'general') {
-            const rows = Array.from(document.querySelectorAll('#mainLeaveTable tbody tr'));
-            let sickCount = 0, personalCount = 0, cancelCount = 0;
-            rows.forEach(r => {
-                const typeText = (r.getAttribute('data-type') || '').trim();
-                if (typeText === 'ลาป่วย') sickCount++;
-                else if (typeText === 'ลากิจ') personalCount++;
-                else if (typeText === 'ยกเลิกวันลา') cancelCount++;
+            const genRecords = globalLeaveRecords.filter(r => r.sheet_type === 'general');
+            let sick = 0, personal = 0, cancel = 0;
+            genRecords.forEach(r => {
+                if (r.leave_type === 'ลาป่วย') sick++;
+                else if (r.leave_type === 'ลากิจ') personal++;
+                else if (r.leave_type === 'ยกเลิกวันลา') cancel++;
             });
-            document.getElementById('stat-total').innerText = rows.length;
-            document.getElementById('stat-sick').innerText = sickCount;
-            document.getElementById('stat-personal').innerText = personalCount;
-            document.getElementById('stat-cancel').innerText = cancelCount;
+            document.getElementById('stat-total').innerText = genRecords.length;
+            document.getElementById('stat-sick').innerText = sick;
+            document.getElementById('stat-personal').innerText = personal;
+            document.getElementById('stat-cancel').innerText = cancel;
         } else {
-            const rows = Array.from(document.querySelectorAll('#vacationLeaveTable tbody tr'));
-            document.getElementById('stat-vacation-total').innerText = rows.length;
+            const vacRecords = globalLeaveRecords.filter(r => r.sheet_type === 'vacation');
+            document.getElementById('stat-vacation-total').innerText = vacRecords.length;
         }
     }
 
-    function syncRegNumber() {
-        let nextVal = parseInt(document.getElementById('global-next-reg').value) || 1;
-        if (nextVal < 1) {
-            nextVal = 1;
-            document.getElementById('global-next-reg').value = 1;
-        }
-
-        if (currentActiveSheet === 'general') {
-            nextRegGeneral = nextVal;
-        } else {
-            nextRegVacation = nextVal;
-        }
-        
-        if (document.getElementById('active-edit-row-id').value === "") {
-            document.getElementById('input-reg-num').value = nextVal;
-            validateDuplicateReg();
-        }
+    function handlePrefixChange() {
+        const prefixSelect = document.getElementById('input-emp-prefix').value;
+        const customInput = document.getElementById('input-custom-prefix');
+        customInput.style.display = (prefixSelect === 'CUSTOM_OTHER') ? 'block' : 'none';
+        customInput.required = (prefixSelect === 'CUSTOM_OTHER');
+        if (prefixSelect !== 'CUSTOM_OTHER') customInput.value = '';
     }
 
-    function validateDuplicateReg() {
-        const regInput = document.getElementById('input-reg-num');
-        let currentValNum = parseInt(regInput.value) || 1;
-        
-        // ล็อกไม่ให้ค่าทะเบียนติดลบหรือเป็น 0 โดยดีดกลับมาเป็น 1 ทันที
-        if (currentValNum < 1) {
-            currentValNum = 1;
-            regInput.value = 1;
-        }
+    function handleEmpNameAutofill() {
+        const nameVal = document.getElementById('input-emp-name').value.trim();
+        if (!nameVal) return;
+        const match = [...globalLeaveRecords].reverse().find(r => r.emp_name === nameVal);
+        if (!match || !match.emp_prefix) return;
 
-        const errorMsg = document.getElementById('reg-error-msg');
-        const submitBtn = document.getElementById('btn-submit-main');
-        const currentVal = String(currentValNum).trim();
-        const activeEditId = document.getElementById('active-edit-row-id').value;
-        if (!currentVal) { checkDateOrderValidity(); return; }
-        
-        const tableSelector = currentActiveSheet === 'general' ? '#mainLeaveTable tbody tr' : '#vacationLeaveTable tbody tr';
-        const rows = Array.from(document.querySelectorAll(tableSelector));
-        let isDuplicate = false;
-        rows.forEach((r) => {
-            if (activeEditId !== "" && r.id === activeEditId) return;
-            const existingReg = r.querySelector('.cell-reg').innerText.trim();
-            if (existingReg === currentVal) { isDuplicate = true; }
-        });
-        
-        if (isDuplicate) {
-            regInput.classList.add('duplicate-error');
-            errorMsg.style.display = "block";
-            submitBtn.disabled = true;
+        const standardPrefixes = ['นาย', 'นาง', 'นางสาว', 'ว่าที่ร้อยตรีหญิง'];
+        const prefixSelect = document.getElementById('input-emp-prefix');
+        const customInput = document.getElementById('input-custom-prefix');
+        if (standardPrefixes.includes(match.emp_prefix)) {
+            prefixSelect.value = match.emp_prefix;
+            customInput.style.display = 'none';
+            customInput.required = false;
+            customInput.value = '';
         } else {
-            regInput.classList.remove('duplicate-error');
-            errorMsg.style.display = "none";
-            checkDateOrderValidity(); 
+            prefixSelect.value = 'CUSTOM_OTHER';
+            customInput.style.display = 'block';
+            customInput.required = true;
+            customInput.value = match.emp_prefix;
         }
-    }
-
-    function checkDateOrderValidity() {
-        const d1 = document.getElementById('input-start-date').value;
-        const d2 = document.getElementById('input-end-date').value;
-        const dateErrorMsg = document.getElementById('date-order-error-msg');
-        const submitBtn = document.getElementById('btn-submit-main');
-        const regInputHasError = document.getElementById('input-reg-num').classList.contains('duplicate-error');
-
-        if (regInputHasError) return;
-
-        if (d1 && d2) {
-            const dateStart = new Date(d1);
-            const dateEnd = new Date(d2);
-            if (dateEnd < dateStart) {
-                dateErrorMsg.style.display = "block";
-                submitBtn.disabled = true;
-                return false;
-            }
-        }
-        dateErrorMsg.style.display = "none";
-        submitBtn.disabled = false;
-        return true;
     }
 
     function toggleHalfDayMenu() {
-        const checked = document.getElementById('check-half-day').checked;
-        document.getElementById('select-half-time').style.display = checked ? "inline-block" : "none";
+        const isChecked = document.getElementById('check-half-day').checked;
+        document.getElementById('halfday-period-wrap').classList.toggle('is-open', isChecked);
+        document.getElementById('halfday-card').classList.toggle('is-checked', isChecked);
         execDaysCalc();
-    }
-
-    function formatDisplayDays(daysNum) {
-        if (daysNum % 1 === 0) {
-            return daysNum + " วัน";
-        } else {
-            let intPart = Math.floor(daysNum);
-            return (intPart === 0 ? "" : intPart) + "½ วัน";
-        }
     }
 
     function execDaysCalc() {
-        const d1 = document.getElementById('input-start-date').value;
-        const d2 = document.getElementById('input-end-date').value;
-        const isHalf = document.getElementById('check-half-day').checked;
-        const outField = document.getElementById('input-total-days');
-        
-        const isValidOrder = checkDateOrderValidity();
-        if (!isValidOrder) {
-            outField.value = "ช่วงวันที่ไม่ถูกต้อง";
-            return;
-        }
+        const startVal = document.getElementById('input-start-date').value;
+        const endVal = document.getElementById('input-end-date').value;
+        const totalInput = document.getElementById('input-total-days');
+        const dateError = document.getElementById('date-order-error-msg');
 
-        if (d1 && d2) {
-            const dateStart = new Date(d1);
-            const dateEnd = new Date(d2);
-            let count = Math.ceil(Math.abs(dateEnd - dateStart) / (1000 * 60 * 60 * 24)) + 1;
-            let numericDays = isHalf ? (count - 1 + 0.5) : count;
-            outField.value = formatDisplayDays(numericDays);
-        } else {
-            outField.value = "0 วัน";
-        }
+        if (!startVal || !endVal) { totalInput.value = "0 วัน"; return; }
+        const d1 = new Date(startVal); const d2 = new Date(endVal);
+
+        if (d2 < d1) { dateError.style.display = 'block'; totalInput.value = "0 วัน"; return; } 
+        else { dateError.style.display = 'none'; }
+
+        const diffTime = Math.abs(d2 - d1);
+        let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+        if (document.getElementById('check-half-day').checked) {
+            if (diffDays === 1) totalInput.value = "1/2 วัน";
+            else totalInput.value = `${diffDays - 1} 1/2 วัน`;
+        } else { totalInput.value = `${diffDays} วัน`; }
     }
 
-    function parseThaiDate(strFormat) {
-        if (!strFormat) return "";
-        const d = new Date(strFormat);
-        const mList = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-        return `${d.getDate()} ${mList[d.getMonth()]} ${String(d.getFullYear() + 543).substring(2)}`;
-    }
-
-    function openRangeModal() { document.getElementById('downloadModal').style.display = "flex"; }
-    function closeRangeModal() { document.getElementById('downloadModal').style.display = "none"; }
-
-    function toggleDeletedTooltip(e, mode) {
-        e.stopPropagation();
-        const tooltipId = mode === 'general' ? 'deleted-master-tooltip' : 'deleted-master-tooltip-vacation';
-        const box = document.getElementById(tooltipId);
-        box.style.display = (box.style.display === "block") ? "none" : "block";
-    }
-
-    function triggerEditMode(rowId) {
-        const tr = document.getElementById(rowId);
-        if (!tr) return;
-        
-        const headingId = currentActiveSheet === 'general' ? 'form-heading-title' : 'form-heading-title-vacation';
-        document.getElementById(headingId).innerText = "กำลังแก้ไขข้อมูลทะเบียนรับเลขที่: " + tr.querySelector('.cell-reg').innerText;
-        
-        document.getElementById('active-edit-row-id').value = rowId;
-        document.getElementById('btn-cancel-edit-mode').style.display = "inline-block";
-        document.getElementById('btn-submit-main').innerText = "ยืนยันการแก้ไขข้อมูล";
-        document.getElementById('input-reg-num').value = tr.querySelector('.cell-reg').innerText;
-        document.getElementById('input-doc-date').value = tr.getAttribute('data-doc');
-        
-        const pureName = tr.getAttribute('data-pure-name') || "";
-        const savedPrefix = tr.getAttribute('data-prefix') || "นาย";
-        const prefixSelect = document.getElementById('input-emp-prefix');
-        const customInput = document.getElementById('input-custom-prefix');
-        
-        if (["นาย", "นาง", "นางสาว", "ว่าที่ร้อยตรีหญิง"].includes(savedPrefix)) {
-            prefixSelect.value = savedPrefix;
-            customInput.style.display = "none";
-            customInput.value = "";
-        } else {
-            prefixSelect.value = "CUSTOM_OTHER";
-            customInput.style.display = "block";
-            customInput.value = savedPrefix;
-        }
-        document.getElementById('input-emp-name').value = pureName;
-        
-        document.getElementById('input-leave-type').value = tr.getAttribute('data-type') || tr.querySelector('.cell-type').innerText.trim();
-        
-        document.getElementById('input-start-date').value = tr.getAttribute('data-start');
-        document.getElementById('input-end-date').value = tr.getAttribute('data-end');
-        const checked = tr.getAttribute('data-is-half') === "true";
-        document.getElementById('check-half-day').checked = checked;
-        document.getElementById('select-half-time').style.display = checked ? "inline-block" : "none";
-        if (checked) {
-            document.getElementById('select-half-time').value = tr.getAttribute('data-half-val');
-        }
-        const rawDept = (tr.getAttribute('data-dept') || tr.querySelector('.cell-action').innerText.replace('.', '')).trim();
-        document.getElementById('input-action-dept').value = rawDept;
-        document.getElementById('input-remark').value = tr.getAttribute('data-remark') || "";
-        execDaysCalc();
-        validateDuplicateReg();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function triggerDeleteRow(rowId) {
-        const tr = document.getElementById(rowId);
-        if (!tr) return;
-        const regNum = tr.querySelector('.cell-reg').innerText.trim();
-        const empName = tr.getAttribute('data-emp') || tr.querySelector('.cell-name').innerText.trim();
-        const creatorName = tr.getAttribute('data-creator') || "ไม่ทราบชื่อ";
-        
-        if (confirm(`คุณต้องการลบทะเบียนเลขที่ ${regNum} ของคุณ ${empName} ใช่หรือไม่?`)) {
-            const deleterName = document.getElementById('current-user-display').innerText;
-            const now = new Date();
-            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} น.`;
-            const dateStr = parseThaiDate(now.toISOString().split('T')[0]);
-            
-            const logItem = { reg: regNum, emp: empName, creator: creatorName, user: deleterName, date: dateStr, time: timeStr };
-
-            if(currentActiveSheet === 'general') {
-                globalDeletedLogs.push(logItem);
-                renderDeletedLogsMaster('general');
-            } else {
-                globalDeletedLogsVacation.push(logItem);
-                renderDeletedLogsMaster('vacation');
-            }
-            
-            tr.remove();
-            updateStatCards();
-            if(document.getElementById('active-edit-row-id').value === rowId) {
-                exitEditMode();
-            }
+    function syncRegNumber() {
+        const val = parseInt(document.getElementById('global-next-reg').value) || 1;
+        if (!document.getElementById('active-edit-row-id').value) {
+            document.getElementById('input-reg-num').value = val; validateDuplicateReg();
         }
     }
 
-    function renderDeletedLogsMaster(mode) {
-        const containerId = mode === 'general' ? 'deleted-logs-container' : 'deleted-logs-container-vacation';
-        const masterBadgeId = mode === 'general' ? 'deleted-history-master' : 'deleted-history-master-vacation';
-        const logsList = mode === 'general' ? globalDeletedLogs : globalDeletedLogsVacation;
-        
-        const container = document.getElementById(containerId);
-        const masterBadge = document.getElementById(masterBadgeId);
-        
-        if(logsList.length === 0) {
-            masterBadge.style.display = "none";
-            return;
+    function openRangeModal() { document.getElementById('downloadModal').style.display = 'flex'; }
+    function closeRangeModal() { document.getElementById('downloadModal').style.display = 'none'; }
+    function getBadgeClass(type) { return type === 'ลาป่วย' ? 'badge-sick' : type === 'ลากิจ' ? 'badge-personal' : type === 'ลาพักผ่อน' ? 'badge-vacation' : 'badge-cancel'; }
+    function getDeptClass(dept) { return dept === 'สอก' ? 'dept-sok' : dept === 'สวว' ? 'dept-swv' : dept === 'สวป' ? 'dept-swp' : dept === 'สวล' ? 'dept-swl' : 'dept-sst'; }
+    function formatThaiDate(dateStr) { if (!dateStr) return '-'; const d = new Date(dateStr); if (isNaN(d.getTime())) return dateStr; return d.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: '2-digit' }); }
+
+    function formatThaiDateRange(startStr, endStr) {
+        const d1 = new Date(startStr), d2 = new Date(endStr);
+        if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return `${formatThaiDate(startStr)} - ${formatThaiDate(endStr)}`;
+        const sameYear = d1.getFullYear() === d2.getFullYear();
+        if (sameYear) {
+            const shortStart = d1.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit' });
+            return `${shortStart} - ${formatThaiDate(endStr)}`;
         }
-        masterBadge.style.display = "inline-block";
-        let html = "";
-        logsList.forEach((item) => {
-            html += `
-                <div class="deleted-log-card">
-                    <div class="deleted-log-title">
-                        <span>ข้อมูลถูกนำออกระบบ</span>
-                        <span class="deleted-log-reg-badge">เลขทะเบียน ${item.reg}</span>
-                    </div>
-                    <div class="deleted-log-meta">ชื่อเจ้าของใบลา: <b>${item.emp}</b></div>
-                    <div class="deleted-log-meta">ผู้บันทึกข้อมูลแรกเริ่ม: <b>${item.creator}</b></div>
-                    <div class="deleted-log-meta">ผู้ดำเนินการลบ: <b style="color:red;">${item.user}</b></div>
-                    <div class="deleted-log-time">${item.date} | ${item.time}</div>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-    }
-
-    function exitEditMode() {
-        document.getElementById('form-heading-title').innerText = "บันทึกข้อมูลใบลาป่วย/ลากิจ";
-        document.getElementById('form-heading-title-vacation').innerText = "บันทึกข้อมูลใบลาพักผ่อน";
-        document.getElementById('active-edit-row-id').value = "";
-        document.getElementById('btn-cancel-edit-mode').style.display = "none";
-        document.getElementById('btn-submit-main').innerText = "บันทึกข้อมูลเข้าระบบ";
-        document.getElementById('leaveDataForm').reset();
-        document.getElementById('input-emp-prefix').value = "นาย";
-        document.getElementById('input-custom-prefix').style.display = "none";
-        document.getElementById('check-half-day').checked = false;
-        document.getElementById('select-half-time').style.display = "none";
-        document.getElementById('input-remark').value = "";
-        document.getElementById('date-order-error-msg').style.display = "none";
-        
-        const currentNext = currentActiveSheet === 'general' ? nextRegGeneral : nextRegVacation;
-        document.getElementById('global-next-reg').value = currentNext;
-        document.getElementById('input-reg-num').value = currentNext;
-        validateDuplicateReg();
-    }
-
-    function getLeaveBadgeClass(type) {
-        if (type === "ลาป่วย") return "badge-sick";
-        if (type === "ลากิจ") return "badge-personal";
-        if (type === "ลาพักผ่อน") return "badge-vacation";
-        return "badge-cancel";
-    }
-
-    function updateDatalist() {
-        const datalist = document.getElementById('emp-datalist');
-        datalist.innerHTML = "";
-        Object.keys(savedNamesMap).forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            datalist.appendChild(opt);
-        });
-    }
-
-    function handleFormSubmit(e) {
-        e.preventDefault();
-        
-        if (!checkDateOrderValidity()) return;
-
-        const activeEditId = document.getElementById('active-edit-row-id').value;
-        const regNum = parseInt(document.getElementById('input-reg-num').value);
-        const rawDoc = document.getElementById('input-doc-date').value;
-        const rawStart = document.getElementById('input-start-date').value;
-        const rawEnd = document.getElementById('input-end-date').value;
-        
-        const prefixSelect = document.getElementById('input-emp-prefix').value;
-        const empPrefix = prefixSelect === "CUSTOM_OTHER" ? document.getElementById('input-custom-prefix').value.trim() : prefixSelect;
-        const empPureName = document.getElementById('input-emp-name').value.trim();
-        const empName = empPrefix + " " + empPureName;
-        
-        if (empPureName) {
-            savedNamesMap[empPureName] = true;
-            updateDatalist();
-        }
-        
-        const supName = document.getElementById('input-sup-name').value;
-        const typeLeave = document.getElementById('input-leave-type').value;
-        const totalDays = document.getElementById('input-total-days').value;
-        const deptVal = document.getElementById('input-action-dept').value;
-        const remarkText = document.getElementById('input-remark').value.trim();
-        const isHalf = document.getElementById('check-half-day').checked;
-        const halfTimeStr = isHalf ? document.getElementById('select-half-time').value : "";
-        const badgeClass = getLeaveBadgeClass(typeLeave);
-        const currentUser = document.getElementById('current-user-display').innerText;
-        
-        let textRange = rawStart === rawEnd ? parseThaiDate(rawStart) : `${parseThaiDate(rawStart)} - ${parseThaiDate(rawEnd)}`;
-        if (isHalf) { textRange = `${parseThaiDate(rawStart)} (${halfTimeStr})`; }
-
-        if (activeEditId !== "") {
-            const tr = document.getElementById(activeEditId);
-            if (tr) {
-                let currentEditCount = parseInt(tr.getAttribute('data-edits') || 0) + 1;
-                const creatorName = tr.getAttribute('data-creator') || "ไม่ระบุ";
-                const now = new Date();
-                const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} น.`;
-                const dateStr = parseThaiDate(now.toISOString().split('T')[0]);
-
-                let changes = [];
-                const oldReg = tr.querySelector('.cell-reg').innerText.trim();
-                const oldDoc = tr.getAttribute('data-doc');
-                const oldEmp = tr.getAttribute('data-emp') || tr.querySelector('.cell-name').innerText.trim();
-                const oldType = tr.getAttribute('data-type') || tr.querySelector('.cell-type').innerText.trim();
-                const oldStart = tr.getAttribute('data-start');
-                const oldEnd = tr.getAttribute('data-end');
-                const oldIsHalf = tr.getAttribute('data-is-half') === "true";
-                const oldHalfVal = tr.getAttribute('data-half-val') || "";
-                const oldDept = (tr.getAttribute('data-dept') || "").trim();
-                const oldRemark = tr.getAttribute('data-remark') || "";
-
-                if (oldReg !== String(regNum)) changes.push(`เลขทะเบียน: จาก ${oldReg} เป็น ${regNum}`);
-                if (oldDoc !== rawDoc) changes.push(`วันที่รายงาน: จาก ${parseThaiDate(oldDoc)} เป็น ${parseThaiDate(rawDoc)}`);
-                if (oldEmp !== empName) changes.push(`ชื่อพนักงาน: จาก ${oldEmp} เป็น ${empName}`);
-                if (oldType !== typeLeave) changes.push(`ประเภทลา: จาก ${oldType} เป็น ${typeLeave}`);
-                if (oldStart !== rawStart || oldEnd !== rawEnd || oldIsHalf !== isHalf || oldHalfVal !== halfTimeStr) {
-                    let oldRangeText = oldStart === oldEnd ? parseThaiDate(oldStart) : `${parseThaiDate(oldStart)} - ${parseThaiDate(oldEnd)}`;
-                    if (oldIsHalf) oldRangeText = `${parseThaiDate(oldStart)} (${oldHalfVal})`;
-                    changes.push(`ระยะเวลา: จาก ${oldRangeText} เป็น ${textRange}`);
-                }
-                if (oldDept !== deptVal) changes.push(`หน่วยงาน: จาก ${oldDept} เป็น ${deptVal}`);
-                if (oldRemark !== remarkText) changes.push(`หมายเหตุ: จาก ${oldRemark || 'ไม่มี'} เป็น ${remarkText || 'ไม่มี'}`);
-
-                let historyArray = [];
-                try { historyArray = JSON.parse(tr.getAttribute('data-history-log') || '[]'); } catch (err) { historyArray = []; }
-
-                historyArray.push({ count: currentEditCount, user: currentUser, date: dateStr, time: timeStr, changes: changes });
-
-                tr.className = "";
-                if (typeLeave === "ยกเลิกวันลา") {
-                    tr.classList.add('row-cancel-highlight');
-                }
-
-                tr.setAttribute('data-doc', rawDoc);
-                tr.setAttribute('data-start', rawStart);
-                tr.setAttribute('data-end', rawEnd);
-                tr.setAttribute('data-is-half', isHalf ? "true" : "false");
-                tr.setAttribute('data-half-val', halfTimeStr);
-                tr.setAttribute('data-edits', currentEditCount);
-                tr.setAttribute('data-history-log', JSON.stringify(historyArray));
-                tr.setAttribute('data-emp', empName);
-                tr.setAttribute('data-prefix', empPrefix);
-                tr.setAttribute('data-pure-name', empPureName);
-                tr.setAttribute('data-type', typeLeave);
-                tr.setAttribute('data-dept', deptVal);
-                tr.setAttribute('data-remark', remarkText);
-
-                let timelineItemsHtml = "";
-                historyArray.forEach(item => {
-                    let changesHtml = "";
-                    if (item.changes && item.changes.length > 0) {
-                        changesHtml = `<div class="history-change-log">`;
-                        item.changes.forEach(c => { changesHtml += `<div class="history-change-item">${c}</div>`; });
-                        changesHtml += `</div>`;
-                    }
-                    timelineItemsHtml += `
-                        <div class="history-card-item">
-                            <div class="history-card-title">แก้ไขครั้งที่ ${item.count}</div>
-                            <div class="history-card-meta">ผู้แก้ไข: <b>${item.user}</b></div>
-                            <div class="history-card-meta">${item.date} | ${item.time}</div>
-                            ${changesHtml}
-                        </div>
-                    `;
-                });
-
-                tr.innerHTML = `
-                    <td class="cell-reg">${regNum}</td>
-                    <td class="cell-doc">${parseThaiDate(rawDoc)}</td>
-                    <td class="cell-name">
-                        <div>${empName}</div>
-                        <span class="creator-stamp-tag">เพิ่มโดย: ${creatorName}</span>
-                    </td>
-                    <td class="cell-sup">${supName}</td>
-                    <td class="cell-type"><span class="badge-type ${badgeClass}">${typeLeave}</span></td>
-                    <td class="cell-range">${textRange}</td>
-                    <td class="cell-days">${totalDays}</td>
-                    <td class="cell-action">${getDeptBadge(deptVal)}</td>
-                    <td class="cell-remark">${remarkText}</td>
-                    <td style="text-align:right;">
-                        <button class="action-link" onclick="triggerEditMode('${activeEditId}')">แก้ไข</button>
-                        <button class="action-link delete-btn" onclick="triggerDeleteRow('${activeEditId}')">ลบ</button>
-                        <div class="history-container">
-                            <span class="history-trigger-text">ปรับปรุงแล้ว ${currentEditCount} ครั้ง</span>
-                            <div class="history-tooltip-box">
-                                <div class="history-header">ไทม์ไลน์ประวัติการบันทึกข้อมูล</div>
-                                <div class="history-timeline-flow">${timelineItemsHtml}</div>
-                            </div>
-                        </div>
-                    </td>
-                `;
-            }
-            exitEditMode();
-            resortTableRecords();
-        } else {
-            const tableBodySelector = currentActiveSheet === 'general' ? '#mainLeaveTable tbody' : '#vacationLeaveTable tbody';
-            const tbody = document.querySelector(tableBodySelector);
-            const newTr = document.createElement('tr');
-            const uniqueId = "row-uid-" + Date.now();
-            newTr.id = uniqueId;
-            
-            if (typeLeave === "ยกเลิกวันลา") {
-                newTr.classList.add('row-cancel-highlight');
-            }
-
-            newTr.setAttribute('data-doc', rawDoc);
-            newTr.setAttribute('data-start', rawStart);
-            newTr.setAttribute('data-end', rawEnd);
-            newTr.setAttribute('data-is-half', isHalf ? "true" : "false");
-            newTr.setAttribute('data-half-val', halfTimeStr);
-            newTr.setAttribute('data-edits', "0");
-            newTr.setAttribute('data-history-log', "[]");
-            newTr.setAttribute('data-emp', empName);
-            newTr.setAttribute('data-prefix', empPrefix);
-            newTr.setAttribute('data-pure-name', empPureName);
-            newTr.setAttribute('data-type', typeLeave);
-            newTr.setAttribute('data-dept', deptVal);
-            newTr.setAttribute('data-remark', remarkText);
-            newTr.setAttribute('data-creator', currentUser);
-
-            newTr.innerHTML = `
-                <td class="cell-reg">${regNum}</td>
-                <td class="cell-doc">${parseThaiDate(rawDoc)}</td>
-                <td class="cell-name">
-                    <div>${empName}</div>
-                    <span class="creator-stamp-tag">เพิ่มโดย: ${currentUser}</span>
-                </td>
-                <td class="cell-sup">${supName}</td>
-                <td class="cell-type"><span class="badge-type ${badgeClass}">${typeLeave}</span></td>
-                <td class="cell-range">${textRange}</td>
-                <td class="cell-days">${totalDays}</td>
-                <td class="cell-action">${getDeptBadge(deptVal)}</td>
-                <td class="cell-remark">${remarkText}</td>
-                <td style="text-align:right;">
-                    <button class="action-link" onclick="triggerEditMode('${uniqueId}')">แก้ไข</button>
-                    <button class="action-link delete-btn" onclick="triggerDeleteRow('${uniqueId}')">ลบ</button>
-                    <div class="history-container" style="display:none;"></div>
-                </td>
-            `;
-            tbody.appendChild(newTr);
-            
-            if(currentActiveSheet === 'general') {
-                nextRegGeneral = regNum + 1;
-                document.getElementById('global-next-reg').value = nextRegGeneral;
-            } else {
-                nextRegVacation = regNum + 1;
-                document.getElementById('global-next-reg').value = nextRegVacation;
-            }
-            
-            exitEditMode();
-            resortTableRecords();
-        }
-        updateStatCards();
-    }
-
-    function resortTableRecords() {
-        const tableBodySelector = currentActiveSheet === 'general' ? '#mainLeaveTable tbody' : '#vacationLeaveTable tbody';
-        const tbody = document.querySelector(tableBodySelector);
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        rows.sort((a, b) => parseInt(a.querySelector('.cell-reg').innerText) - parseInt(b.querySelector('.cell-reg').innerText));
-        rows.forEach(r => tbody.appendChild(r));
-    }
-
-    function getDeptBadge(dept){
-        const map={"สอก":"dept-sok","สวว":"dept-swv","สวป":"dept-swp","สวล":"dept-swl","สสท":"dept-sst"};
-        return `<span class="badge-dept ${map[dept]||''}">${dept}.</span>`;
-    }
-
-    function makeWordDateRangeStr(startIso, endIso, isHalf, halfTimeVal) {
-        if (!startIso || !endIso) return "";
-        const mList = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-        const dStart = new Date(startIso);
-        const dEnd = new Date(endIso);
-        const sDay = dStart.getDate();
-        const sMonthIndex = dStart.getMonth();
-        const sYearShort = String(dStart.getFullYear() + 543).substring(2);
-        const eDay = dEnd.getDate();
-        const eMonthIndex = dEnd.getMonth();
-        const eYearShort = String(dEnd.getFullYear() + 543).substring(2);
-
-        if (isHalf) return `${sDay} ${mList[sMonthIndex]} ${sYearShort} (${halfTimeVal})`;
-        if (startIso === endIso) return `${sDay} ${mList[sMonthIndex]} ${sYearShort}`;
-        if (sMonthIndex === eMonthIndex && sYearShort === eYearShort) return `${sDay} - ${eDay} ${mList[sMonthIndex]} ${sYearShort}`;
-        return `${sDay} ${mList[sMonthIndex]} - ${eDay} ${mList[eMonthIndex]} ${eYearShort}`;
+        return `${formatThaiDate(startStr)} - ${formatThaiDate(endStr)}`;
     }
 
     function generateWordReport() {
-        const startId = parseInt(document.getElementById('range-start-id').value);
-        const endId = parseInt(document.getElementById('range-end-id').value);
-        if (isNaN(startId) || isNaN(endId) || startId > endId) {
-            alert("กรุณาระบุช่วงเลขทะเบียนรับให้ถูกต้อง");
-            return;
-        }
-        
-        const tableSelector = currentActiveSheet === 'general' ? '#mainLeaveTable tbody tr' : '#vacationLeaveTable tbody tr';
-        const rows = Array.from(document.querySelectorAll(tableSelector));
-        const targetRows = rows.filter(r => {
-            const num = parseInt(r.querySelector('.cell-reg').innerText);
-            return num >= startId && num <= endId;
-        });
-        if (targetRows.length === 0) {
-            alert("ไม่พบข้อมูลทะเบียนรับในช่วงที่เลือก");
-            return;
-        }
-        targetRows.sort((a, b) => parseInt(a.querySelector('.cell-reg').innerText) - parseInt(b.querySelector('.cell-reg').innerText));
-        const now = new Date();
-        const thMonthsFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const printDateTimeStr = `วันที่พิมพ์: ${now.getDate()} ${thMonthsFull[now.getMonth()]} ${now.getFullYear() + 543} เวลา ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} น.`;
-        
-        const reportTitle = currentActiveSheet === 'general' ? 'รายงานทะเบียนรับใบลาป่วย / ลากิจ / ยกเลิกวันลา สวพ.' : 'รายงานทะเบียนรับใบลาพักผ่อนพนักงาน';
-        const filePrefix = currentActiveSheet === 'general' ? 'รายงานทะเบียนใบลาทั่วไป' : 'รายงานทะเบียนใบลาพักผ่อน';
+        const startId = parseInt(document.getElementById('range-start-id').value) || 1;
+        const endId = parseInt(document.getElementById('range-end-id').value) || 1;
+        if (endId < startId) { alert('เลขทะเบียนสิ้นสุดต้องไม่น้อยกว่าทะเบียนเริ่มต้น'); return; }
 
-        let rowsHtml = "";
-        targetRows.forEach(r => {
-            const startStr = r.getAttribute('data-start');
-            const endStr = r.getAttribute('data-end');
-            const isHalf = r.getAttribute('data-is-half') === "true";
-            const halfTimeStr = r.getAttribute('data-half-val') || "";
-            const currentType = r.getAttribute('data-type') || r.querySelector('.cell-type').innerText.trim();
-            const originalRemark = (r.getAttribute('data-remark') || "").trim();
-            const customRangeTextWord = makeWordDateRangeStr(startStr, endStr, isHalf, halfTimeStr);
+        const filtered = globalLeaveRecords.filter(r => r.sheet_type === currentActiveSheet && r.reg_num >= startId && r.reg_num <= endId);
+        if (filtered.length === 0) { alert('ไม่พบข้อมูลทะเบียนในช่วงที่ระบุ'); return; }
 
-            let rowBgStyle = currentType === "ยกเลิกวันลา" ? `background-color:#fdf2f2; color:#b53e3e;` : "";
+        let filePrefix = currentActiveSheet === 'general' ? 'ทะเบียนใบลาป่วย_ลากิจ' : 'ทะเบียนใบลาพักผ่อน';
+        let rowsHtml = '';
+        
+        filtered.forEach(r => {
+            let dateStr = r.start_date === r.end_date ? formatThaiDate(r.start_date) : formatThaiDateRange(r.start_date, r.end_date);
+            if (r.half_day) dateStr += `<br><span style="font-size:10.5pt; color:#555;">ครึ่งวัน (${r.half_time})</span>`;
+            let docDaysDisplay = r.total_days === 0.5 ? "1/2" : !Number.isInteger(r.total_days) ? `${Math.floor(r.total_days)} 1/2` : r.total_days;
 
             rowsHtml += `
-                <tr style="border:1px solid #000000; ${rowBgStyle}">
-                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-reg').innerText}</td>
-                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-doc').innerText}</td>
-                    <td style="border:1px solid #000000; padding:7px;">${r.querySelector('.cell-name div').innerText}</td>
-                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-sup').innerText}</td>
-                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${currentType}</td>
-                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${customRangeTextWord}</td>
-                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.querySelector('.cell-days').innerText}</td>
-                    <td style="border:1px solid #000000; padding:7px; text-align:center;">${r.getAttribute('data-dept')}.</td>
-                    <td style="border:1px solid #000000; padding:7px;">${originalRemark}</td>
+                <tr>
+                    <td style="text-align:center;">${r.reg_num}</td>
+                    <td style="text-align:center;">${formatThaiDate(r.doc_date)}</td>
+                    <td>${r.emp_prefix || ''}${r.emp_name}</td>
+                    <td>${r.sup_name || 'ผอ.สวพ'}</td>
+                    <td style="text-align:center;">${r.leave_type}</td>
+                    <td style="text-align:center;">${dateStr}</td>
+                    <td style="text-align:center;">${docDaysDisplay}</td>
+                    <td style="text-align:center;">${r.action_dept || ''}</td>
+                    <td>${r.remark || ''}</td>
                 </tr>
             `;
         });
+
+        const now = new Date();
+        const printedAt = now.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: '2-digit' }) + ' เวลา ' + now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
+
         const htmlPayload = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
             <head>
-                <meta charset='utf-8'>
-                <style>
-                    @page Section1 { size: 11.69in 8.27in; margin: 0.5in 0.5in 0.6in 0.5in; mso-page-orientation: landscape; mso-header-margin:0.5in; mso-footer-margin:0.3in; mso-footer: url(#subFooter); }
-                    div.Section1 { page: Section1; }
-                    body { font-family: 'TH SarabunPSK', 'TH Sarabun New', sans-serif; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th { border: 1px solid #000000; padding: 7px; background-color: #f2f2f2; font-size: 14pt; font-weight: bold; text-align:center; }
-                    td { font-size: 14pt; }
-                </style>
+            <meta charset="utf-8">
+            <style>
+                @page Section1 {
+                    size: 29.7cm 21cm;
+                    mso-page-orientation: landscape;
+                    margin: 1.3cm 1.5cm 1.6cm 1.5cm;
+                    mso-header-margin: .8cm;
+                    mso-footer-margin: .8cm;
+                    mso-header: h1;
+                    mso-footer: f1;
+                }
+                div.Section1 { page: Section1; }
+                body { font-family:'TH SarabunPSK', sans-serif; font-size:14pt; }
+                table.report-table { width:100%; border-collapse:collapse; }
+                table.report-table th, table.report-table td { border:1px solid #000; padding:5px; font-size:13pt; }
+                table.report-table th { background-color:#f2f2f2; }
+                table.header-table, table.header-table td, table.header-table tr { border:none; }
+            </style>
             </head>
             <body>
-                <div class="Section1">
-                    <p style="text-align:right; font-size:13pt; margin:0;">${printDateTimeStr}</p>
-                    <h2 style="text-align:center; font-size:18pt; font-weight:bold; margin:5px 0 5px 0;">${reportTitle}</h2>
-                    <p style="text-align:center; font-size:14pt; margin:0 0 10px 0;">ข้อมูลเลขทะเบียนรับลำดับช่วงที่ ${startId} ถึงลำดับที่ ${endId}</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 7%;">ทะเบียนรับ</th>
-                                <th style="width: 10%;">ลงวันที่</th>
-                                <th style="width: 20%;">จาก</th>
-                                <th style="width: 8%;">ถึง</th>
-                                <th style="width: 12%;">ประเภทการลา</th>
-                                <th style="width: 17%;">ลาวันที่</th>
-                                <th style="width: 8%;">จำนวนวัน</th>
-                                <th style="width: 8%;">การปฏิบัติ</th>
-                                <th style="width: 10%;">หมายเหตุ</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rowsHtml}</tbody>
+                <div style='mso-element:header' id=h1>
+                    <table class="header-table" style="width:100%;">
+                        <tr>
+                            <td style="text-align:left; font-weight:bold; font-size:16pt; border:none;">ทะเบียนรับใบลา</td>
+                            <td style="text-align:right; font-size:12pt; border:none;">พิมพ์เมื่อ ${printedAt}</td>
+                        </tr>
                     </table>
                 </div>
-                <div style="mso-element:footer" id="subFooter">
-                    <p style="text-align:right; font-size:12pt; margin:0; font-family:'TH SarabunPSK', sans-serif;">
-                        <span style="mso-field-code:'PAGE'">1</span>/<span style="mso-field-code:'NUMPAGES'">1</span>
-                    </p>
+                <div style='mso-element:footer' id=f1>
+                    <p style="text-align:right; font-size:12pt; margin:0;"><span style='mso-field-code:" PAGE "'>1</span>/<span style='mso-field-code:" NUMPAGES "'>1</span></p>
+                </div>
+
+                <div class="Section1">
+                    <p style="text-align:center; font-size:15pt; font-weight:bold; margin-bottom:16px;">${filePrefix} เลขทะเบียนที่ ${startId} ถึง ${endId}</p>
+                    <table class="report-table">
+                        <thead><tr><th>เลขทะเบียน</th><th>ลงวันที่</th><th>จาก</th><th>ถึง</th><th>ประเภทการลา</th><th>ลาวันที่</th><th>จำนวนวัน</th><th>การปฏิบัติ</th><th>หมายเหตุ</th></tr></thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
                 </div>
             </body>
             </html>
         `;
+
         const blob = new Blob(['\ufeff' + htmlPayload], { type: 'application/msword' });
         const url = URL.createObjectURL(blob);
         const aLink = document.createElement('a');
-        aLink.href = url;
-        aLink.download = `${filePrefix}_${startId}_ถึง_${endId}.doc`;
-        document.body.appendChild(aLink);
-        aLink.click();
-        document.body.removeChild(aLink);
+        aLink.href = url; aLink.download = `${filePrefix}_${startId}_ถึง_${endId}.doc`;
+        document.body.appendChild(aLink); aLink.click(); document.body.removeChild(aLink);
         closeRangeModal();
     }
 </script>
