@@ -600,7 +600,7 @@
             </div>
         </div>
         <div class="header-controls">
-            <button class="btn-modern-primary" onclick="openRangeModal()">พิมพ์รายงานสรุป</button>
+            <button class="btn-modern-primary" onclick="openRangeModal()">พิมพ์รายงานทะเบียนรับ</button>
             <div class="reg-counter-card">
                 <span>ทะเบียนถัดไป:</span>
                 <input type="number" id="global-next-reg" value="1" min="1" onchange="syncRegNumber()">
@@ -825,16 +825,16 @@
 
 <div class="modal-overlay" id="downloadModal">
     <div class="modal-card">
-        <h3>จัดทำเอกสารรายงานสรุป</h3>
-        <p>โปรดระบุช่วงเลขทะเบียนเพื่อทำการประมวลผลข้อมูล</p>
+        <h3>พิมพ์รายงานทะเบียนรับ</h3>
+        <p>โปรดระบุช่วงเลขทะเบียน</p>
         <div class="modal-grid">
             <div class="form-group">
                 <label>ทะเบียนเริ่มต้น</label>
-                <input type="number" id="range-start-id" value="1" min="1">
+                <input type="number" id="range-start-id" placeholder="ระบุเลขทะเบียนเริ่มต้น" min="1">
             </div>
             <div class="form-group">
                 <label>ทะเบียนสิ้นสุด</label>
-                <input type="number" id="range-end-id" value="10" min="1">
+                <input type="number" id="range-end-id" placeholder="ระบุเลขทะเบียนสิ้นสุด" min="1">
             </div>
         </div>
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
@@ -1461,7 +1461,7 @@
         const filtered = globalLeaveRecords.filter(r => r.sheet_type === currentActiveSheet && r.reg_num >= startId && r.reg_num <= endId);
         if (filtered.length === 0) { alert('ไม่พบข้อมูลทะเบียนในช่วงที่ระบุ'); return; }
 
-        let filePrefix = currentActiveSheet === 'general' ? 'ทะเบียนใบลาป่วย_ลากิจ' : 'ทะเบียนใบลาพักผ่อน';
+        let filePrefix = currentActiveSheet === 'general' ? 'ทะเบียนใบลาป่วย / ลากิจ / ลาคลอดบุตร' : 'ทะเบียนใบลาพักผ่อน';
         let rowsHtml = '';
         
         filtered.forEach(r => {
@@ -1514,16 +1514,16 @@
                     <table class="header-table" style="width:100%;">
                         <tr>
                             <td style="text-align:left; font-weight:bold; font-size:16pt; border:none;">ทะเบียนรับใบลา</td>
-                            <td style="text-align:right; font-size:12pt; border:none;">พิมพ์เมื่อ ${printedAt}</td>
+                            <td style="text-align:right; font-size:14pt; border:none;">พิมพ์เมื่อ ${printedAt}</td>
                         </tr>
                     </table>
                 </div>
                 <div style='mso-element:footer' id=f1>
-                    <p style="text-align:right; font-size:12pt; margin:0;"><span style='mso-field-code:" PAGE "'>1</span>/<span style='mso-field-code:" NUMPAGES "'>1</span></p>
+                    <p style="text-align:right; font-size:14pt; margin:0;"><span style='mso-field-code:" PAGE "'>1</span>/<span style='mso-field-code:" NUMPAGES "'>1</span></p>
                 </div>
 
                 <div class="Section1">
-                    <p style="text-align:center; font-size:15pt; font-weight:bold; margin-bottom:16px;">${filePrefix} เลขทะเบียนที่ ${startId} ถึง ${endId}</p>
+                    <p style="text-align:center; font-size:15pt; font-weight:bold; margin-bottom:16px;">${filePrefix}</p>
                     <table class="report-table">
                         <thead><tr><th>เลขทะเบียน</th><th>ลงวันที่</th><th>จาก</th><th>ถึง</th><th>ประเภทการลา</th><th>ลาวันที่</th><th>จำนวนวัน</th><th>การปฏิบัติ</th><th>หมายเหตุ</th></tr></thead>
                         <tbody>${rowsHtml}</tbody>
