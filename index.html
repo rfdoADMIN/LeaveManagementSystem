@@ -26,226 +26,57 @@
         }
 
         * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; margin: 0; padding: 0; }
-
         html, body { height: 100%; }
-
-        body {
-            background: var(--bg-canvas);
-            color: var(--text-dark);
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+        body { background: var(--bg-canvas); color: var(--text-dark); display: flex; min-height: 100vh; overflow-x: hidden; }
 
         .brand-side {
-            flex: 1.1;
-            position: relative;
+            flex: 1.1; position: relative;
             background: linear-gradient(160deg, #3f6656 0%, #4f7a68 55%, #6fa088 100%);
-            color: #eef7f1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 56px 60px;
-            overflow: hidden;
+            color: #eef7f1; display: flex; flex-direction: column; justify-content: space-between; padding: 56px 60px; overflow: hidden;
         }
-
-        .brand-side::before,
-        .brand-side::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
-        }
+        .brand-side::before, .brand-side::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.06); }
         .brand-side::before { width: 420px; height: 420px; top: -140px; right: -120px; }
         .brand-side::after { width: 280px; height: 280px; bottom: -100px; left: -60px; background: rgba(255,255,255,0.05); }
 
-        .brand-mark {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-            z-index: 1;
-        }
+        .brand-mark { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
         .brand-mark .leaf-icon { width: 34px; height: 34px; flex-shrink: 0; }
-        .brand-mark span {
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            opacity: 0.92;
-        }
+        .brand-mark span { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; opacity: 0.92; }
 
         .brand-copy { position: relative; z-index: 1; max-width: 380px; }
-        .brand-copy h1 {
-            font-size: 34px;
-            font-weight: 700;
-            line-height: 1.35;
-            margin-bottom: 16px;
-        }
-        .brand-copy p {
-            font-size: 15px;
-            font-weight: 300;
-            line-height: 1.7;
-            opacity: 0.85;
-        }
+        .brand-copy h1 { font-size: 34px; font-weight: 700; line-height: 1.35; margin-bottom: 16px; }
 
-        .brand-footer {
-            position: relative;
-            z-index: 1;
-            font-size: 12.5px;
-            font-weight: 300;
-            opacity: 0.65;
-        }
+        .brand-footer { position: relative; z-index: 1; font-size: 12.5px; font-weight: 300; opacity: 0.65; }
 
-        .form-side {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 24px;
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 380px;
-        }
-
-        .login-card .eyebrow {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--color-primary);
-            letter-spacing: 0.4px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .login-card .eyebrow .leaf-icon-sm { width: 16px; height: 16px; display: none; }
-
-        .login-card h2 {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 6px;
-        }
-
-        .login-card .subtitle {
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 300;
-            margin-bottom: 32px;
-        }
+        .form-side { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+        .login-card { width: 100%; max-width: 380px; }
+        .login-card .eyebrow { font-size: 13px; font-weight: 600; color: var(--color-primary); letter-spacing: 0.4px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .login-card h2 { font-size: 26px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+        .login-card .subtitle { color: var(--text-muted); font-size: 14px; font-weight: 300; margin-bottom: 32px; }
 
         .input-group { margin-bottom: 18px; }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 7px;
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
+        .input-group label { display: block; margin-bottom: 7px; font-size: 13px; color: var(--text-muted); font-weight: 600; }
         .input-wrap { position: relative; }
 
-        input {
-            width: 100%;
-            padding: 13px 16px;
-            border: 1.5px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-size: 15px;
-            color: var(--text-dark);
-            background-color: #fbfdfc;
-            transition: all 0.2s;
-        }
-
+        input { width: 100%; padding: 13px 16px; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); font-size: 15px; color: var(--text-dark); background-color: #fbfdfc; transition: all 0.2s; }
         input::placeholder { color: #b7c4bd; font-weight: 300; }
-
-        input:focus {
-            border-color: var(--color-primary);
-            background-color: #fff;
-            box-shadow: 0 0 0 4px rgba(79, 122, 104, 0.1);
-            outline: none;
-        }
+        input:focus { border-color: var(--color-primary); background-color: #fff; box-shadow: 0 0 0 4px rgba(79, 122, 104, 0.1); outline: none; }
 
         .input-wrap.has-toggle input { padding-right: 46px; }
-
-        .toggle-visibility {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            width: 34px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--text-muted);
-            border-radius: 8px;
-            padding: 0;
-        }
+        .toggle-visibility { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); border-radius: 8px; padding: 0; }
         .toggle-visibility:hover { background: #f1f6f3; color: var(--color-primary); }
         .toggle-visibility svg { width: 19px; height: 19px; }
 
-        .form-error {
-            display: none;
-            align-items: center;
-            gap: 8px;
-            background: #fdf3f3;
-            border: 1px solid #f3d9d9;
-            color: var(--error-color);
-            font-size: 13px;
-            font-weight: 500;
-            padding: 11px 14px;
-            border-radius: var(--radius-md);
-            margin-bottom: 18px;
-        }
+        .form-error { display: none; align-items: center; gap: 8px; background: #fdf3f3; border: 1px solid #f3d9d9; color: var(--error-color); font-size: 13px; font-weight: 500; padding: 11px 14px; border-radius: var(--radius-md); margin-bottom: 18px; }
 
-        button[type="submit"] {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 15.5px;
-            font-weight: 600;
-            color: white;
-            background-color: var(--color-primary);
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
+        button[type="submit"] { width: 100%; padding: 14px; border: none; border-radius: var(--radius-md); font-size: 15.5px; font-weight: 600; color: white; background-color: var(--color-primary); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         button[type="submit"]:hover { background-color: var(--color-primary-deep); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(79,122,104,0.22); }
-        button[type="submit"]:active { transform: scale(0.98); }
         button[type="submit"]:disabled { background-color: #cddcd4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        .spinner {
-            width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.4);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            display: none;
-        }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .login-footnote {
-            text-align: center;
-            font-size: 12.5px;
-            color: var(--text-muted);
-            font-weight: 300;
-            margin-top: 24px;
-        }
-
-        @media (max-width: 900px) {
-            .brand-side { display: none; }
-            .form-side { padding: 60px 24px; }
-        }
+        .login-footnote { text-align: center; font-size: 12.5px; color: var(--text-muted); font-weight: 300; margin-top: 24px; }
+        @media (max-width: 900px) { .brand-side { display: none; } .form-side { padding: 60px 24px; } }
     </style>
 </head>
 <body>
@@ -258,11 +89,9 @@
             </svg>
             <span>ฝ่ายการเจ้าหน้าที่ · ส่วนอำนวยการ สวพ.</span>
         </div>
-
         <div class="brand-copy">
             <h1>ระบบสำหรับทะเบียนรับ<br>ใบลาพนักงาน สวพ.</h1>
         </div>
-
         <div class="brand-footer">เข้าสู่ระบบ</div>
     </div>
 
@@ -295,8 +124,7 @@
                     <span id="btnLabel">เข้าสู่ระบบ</span>
                 </button>
             </form>
-
-            <div class="login-footnote">ลืมรหัสผ่าน? ติดต่อเจ้าหน้าที่ควบคุมระบบ</div>
+            <div class="login-footnote">หากลืมรหัสผ่าน? กรุณาติดต่อเจ้าหน้าที่ควบคุมระบบ</div>
         </div>
     </div>
 
@@ -339,8 +167,13 @@
 
                 if (result.status === "success") {
                     localStorage.setItem('loggedInUser', result.name || usernameInput);
-                    localStorage.setItem('loggedInEmpId', result.empId || usernameInput);
-                    window.location.href = 'Leave.html';
+                    localStorage.setItem('loggedInEmpId', usernameInput);
+                    
+                    if (passwordInput === "5662") {
+                        window.location.href = 'ChangePassword.html';
+                    } else {
+                        window.location.href = 'Leave.html';
+                    }
                 } else {
                     showFormError(result.message || "รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง");
                 }
