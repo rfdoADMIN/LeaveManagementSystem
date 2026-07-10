@@ -32,6 +32,9 @@
             --badge-vacation-bg: #eef3fc;
             --badge-vacation-text: #2b6cb0;
             --badge-vacation-border: #bee3f8;
+            --badge-maternity-bg: #fdeef4;
+            --badge-maternity-text: #b8548a;
+            --badge-maternity-border: #f6cfe1;
             --shadow-premium: 0 12px 40px rgba(79, 122, 104, 0.06);
             --shadow-tooltip: 0 20px 45px rgba(51, 65, 59, 0.25);
             --radius-main: 20px;
@@ -76,7 +79,7 @@
         .user-profile-badge {
             background: rgba(255,255,255,0.14);
             border: 1px solid rgba(255,255,255,0.22);
-            padding: 8px 16px 8px 8px;
+            padding: 8px 16px;
             border-radius: 50px;
             font-size: 13.5px;
             font-weight: 600;
@@ -469,6 +472,21 @@
         }
         .history-log-meta svg { width: 11px; height: 11px; flex-shrink: 0; opacity: 0.8; }
 
+        .history-date-divider {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--color-primary-deep);
+            background: var(--color-mint-soft);
+            border-radius: 6px;
+            padding: 5px 9px;
+            margin: 12px 0 8px;
+        }
+        .history-date-divider:first-child { margin-top: 0; }
+        .history-date-divider svg { width: 11px; height: 11px; flex-shrink: 0; }
+
         .delete-history-btn-wrapper {
             display: flex;
             align-items: center;
@@ -529,6 +547,7 @@
         .badge-personal { background: var(--badge-personal-bg); color: var(--badge-personal-text); border: 1px solid var(--badge-personal-border); }
         .badge-cancel { background: var(--badge-cancel-bg); color: var(--badge-cancel-text); border: 1px solid var(--badge-cancel-border); }
         .badge-vacation { background: var(--badge-vacation-bg); color: var(--badge-vacation-text); border: 1px solid var(--badge-vacation-border); }
+        .badge-maternity { background: var(--badge-maternity-bg); color: var(--badge-maternity-text); border: 1px solid var(--badge-maternity-border); }
         
         .badge-dept { display: inline-block; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; min-width: 58px; text-align: center; }
         .dept-sok { background: #f6f0fd; color: #8e44ad; border: 1px solid #e8daf5; }
@@ -587,7 +606,6 @@
                 <input type="number" id="global-next-reg" value="1" min="1" onchange="syncRegNumber()">
             </div>
             <div class="user-profile-badge" title="คลิกเพื่อออกจากระบบ" onclick="handleLogoutRedirect()">
-                <span class="user-avatar" id="user-avatar-initial">·</span>
                 <span id="current-user-display">กำลังดึงข้อมูลชื่อ...</span>
             </div>
         </div>
@@ -603,7 +621,7 @@
             <input type="hidden" id="active-edit-row-id" value="">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>เลขทะเบียนรับ <span style="font-weight:400; color:var(--text-muted); font-size:11px;">
+                    <label>เลขทะเบียนรับ</label>
                     <input type="number" id="input-reg-num" min="1" required readonly style="background:#f4f7f5; color:var(--text-muted); cursor:not-allowed;">
                     <div class="error-msg-text" id="reg-error-msg">เลขทะเบียนนี้ถูกใช้งานไปแล้ว</div>
                 </div>
@@ -623,10 +641,11 @@
                         </select>
                         <input type="text" id="input-custom-prefix" class="custom-prefix-input" placeholder="ระบุคำนำหน้า...">
                         <input type="text" id="input-emp-name" class="name-fullname-input" list="emp-datalist" required placeholder="พิมพ์ชื่อ-นามสกุลพนักงาน..." oninput="handleEmpNameAutofill()">
+                        <datalist id="emp-datalist"></datalist>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>ถึง (ผู้รับรายงาน)</label>
+                    <label>ถึง</label>
                     <input type="text" id="input-sup-name" value="ผอ.สวพ" readonly style="background:#f4f7f5; color:var(--text-muted); cursor:not-allowed;">
                 </div>
                 <div class="form-group">
@@ -728,19 +747,12 @@
 
         <div class="glass-panel">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                <h2>ทำเนียบประวัติข้อมูลทะเบียนใบลาป่วย/ลากิจ</h2>
+                <h2>ทะเบียนใบลาป่วย/ลากิจ/ลาคลอดบุตร</h2>
                 <div class="delete-history-btn-wrapper">
-                    <button class="btn-delete-log-trigger" onclick="toggleDeleteLogPanel('general')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> เปิด/ปิด ประวัติการลบรายการ</button>
+                    <button class="btn-delete-log-trigger" onclick="toggleDeleteLogPanel('general')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> ประวัติการลบรายการ</button>
                 </div>
             </div>
             
-            <div id="delete-log-panel-general" class="delete-logs-panel" style="display: block;">
-                <h4 style="font-size:14px; margin-bottom:10px; color:var(--error-color);">ประวัติการลบทิ้งข้อมูลใบลาป่วย/ลากิจ</h4>
-                <div id="delete-logs-container-general" style="max-height: 200px; overflow-y: auto;">
-                    <p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>
-                </div>
-            </div>
-
             <div class="table-responsive-box">
                 <table id="mainLeaveTable">
                     <thead>
@@ -782,14 +794,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
                 <h2>ทะเบียนรับใบลาพักผ่อน</h2>
                 <div class="delete-history-btn-wrapper">
-                    <button class="btn-delete-log-trigger" onclick="toggleDeleteLogPanel('vacation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> เปิด/ปิด ประวัติการลบรายการ</button>
-                </div>
-            </div>
-
-            <div id="delete-log-panel-vacation" class="delete-logs-panel" style="display: block;">
-                <h4 style="font-size:14px; margin-bottom:10px; color:var(--error-color);">ประวัติการลบทิ้งข้อมูลใบลาพักผ่อน</h4>
-                <div id="delete-logs-container-vacation" style="max-height: 200px; overflow-y: auto;">
-                    <p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>
+                    <button class="btn-delete-log-trigger" onclick="toggleDeleteLogPanel('vacation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> ประวัติการลบรายการ</button>
                 </div>
             </div>
 
@@ -835,6 +840,30 @@
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
             <button class="btn-modern-ghost" onclick="closeRangeModal()">ยกเลิก</button>
             <button class="btn-solid-primary" onclick="generateWordReport()">ดาวน์โหลด (.doc)</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="deleteLogModal-general">
+    <div class="modal-card" style="max-width: 680px;">
+        <h3 style="color:var(--error-color);">ประวัติการลบทิ้งข้อมูลใบลาป่วย/ลากิจ</h3>
+        <div id="delete-logs-container-general" style="max-height: 320px; overflow-y: auto; margin-bottom: 22px;">
+            <p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn-modern-ghost" onclick="toggleDeleteLogPanel('general')">ปิด</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="deleteLogModal-vacation">
+    <div class="modal-card" style="max-width: 680px;">
+        <h3 style="color:var(--error-color);">ประวัติการลบทิ้งข้อมูลใบลาพักผ่อน</h3>
+        <div id="delete-logs-container-vacation" style="max-height: 320px; overflow-y: auto; margin-bottom: 22px;">
+            <p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn-modern-ghost" onclick="toggleDeleteLogPanel('vacation')">ปิด</button>
         </div>
     </div>
 </div>
@@ -923,7 +952,6 @@
         }
 
         document.getElementById('current-user-display').innerText = loggedInName;
-        document.getElementById('user-avatar-initial').innerText = loggedInName.trim().charAt(0) || '·';
         
         initHistoryTooltipDelegation();
         switchSheet('general');
@@ -998,6 +1026,26 @@
         return d.toLocaleDateString('th-TH', {day:'2-digit', month:'2-digit', year:'2-digit'}) + ' เวลา ' + d.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) + ' น.';
     }
 
+    // ใช้เทียบค่าตัวเลข โดยแปลงชนิดข้อมูลให้ตรงกันก่อนเสมอ
+    // (ป้องกันปัญหา Supabase ส่งค่าตัวเลขบางคอลัมน์กลับมาเป็น string เช่น "5" ขณะที่ค่าจากฟอร์มเป็น number 5
+    // ซึ่งทำให้ !== เข้าใจผิดว่าค่าต่างกัน หรือ === เข้าใจผิดว่าค่าเหมือนกันได้)
+    function isNumEqual(a, b) {
+        const na = (a === null || a === undefined || a === '') ? 0 : parseFloat(a);
+        const nb = (b === null || b === undefined || b === '') ? 0 : parseFloat(b);
+        if (isNaN(na) && isNaN(nb)) return true;
+        return na === nb;
+    }
+
+    // ใช้เทียบค่าข้อความ/วันที่ โดย trim ช่องว่างและมองค่าว่างกับ null/undefined เป็นค่าเดียวกัน
+    // และตัดเวลา/timezone ทิ้งถ้าเป็นรูปแบบวันที่ (เทียบเฉพาะ 10 ตัวแรก YYYY-MM-DD)
+    function isStrEqual(a, b) {
+        const sa = (a === null || a === undefined) ? '' : String(a).trim();
+        const sb = (b === null || b === undefined) ? '' : String(b).trim();
+        const da = /^\d{4}-\d{2}-\d{2}/.test(sa) ? sa.slice(0, 10) : sa;
+        const db = /^\d{4}-\d{2}-\d{2}/.test(sb) ? sb.slice(0, 10) : sb;
+        return da === db;
+    }
+
     function renderTableData() {
         const generalBody = document.querySelector('#mainLeaveTable tbody');
         const vacationBody = document.querySelector('#vacationLeaveTable tbody');
@@ -1060,6 +1108,29 @@
         employeeNames.forEach(name => datalist.innerHTML += `<option value="${name}"></option>`);
     }
 
+    function buildDeleteLogRows(logs, leaveTypeLabelFn) {
+        const sorted = [...logs].sort((a, b) => new Date(b.deleted_at) - new Date(a.deleted_at));
+        let lastDateKey = null;
+        return sorted.map(l => {
+            const d = l.deleted_at ? new Date(l.deleted_at) : null;
+            const validDate = d && !isNaN(d.getTime());
+            const dateKey = validDate ? d.toLocaleDateString('th-TH', {day:'2-digit', month:'2-digit', year:'2-digit'}) : 'ไม่ระบุวันที่';
+            const timeOnly = validDate ? d.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) + ' น.' : '-';
+            let dateHeader = '';
+            if (dateKey !== lastDateKey) {
+                dateHeader = `<div class="history-date-divider">${ICON_CALENDAR} ${dateKey}</div>`;
+                lastDateKey = dateKey;
+            }
+            return `
+                ${dateHeader}
+                <div class="delete-log-row">
+                    <div style="display:flex; align-items:center; gap:10px;"><span class="delete-log-row-icon">${ICON_TRASH}</span> <span><b>ทะเบียนเลขที่ ${l.reg_num}</b> ของคุณ <b>${l.emp_name || '-'}</b> (${leaveTypeLabelFn(l)})</span></div>
+                    <div style="color:var(--text-muted); font-size:11.5px; text-align:right;">ลบโดย: <b>${l.deleted_by || 'ไม่ระบุ'}</b><br>${timeOnly}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
     function renderDeleteLogs() {
         const containerGen = document.getElementById('delete-logs-container-general');
         const containerVac = document.getElementById('delete-logs-container-vacation');
@@ -1070,29 +1141,19 @@
         if(logsGen.length === 0) {
             containerGen.innerHTML = `<p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>`;
         } else {
-            containerGen.innerHTML = logsGen.map(l => `
-                <div class="delete-log-row">
-                    <div style="display:flex; align-items:center; gap:10px;"><span class="delete-log-row-icon">${ICON_TRASH}</span> <span><b>ทะเบียนเลขที่ ${l.reg_num}</b> ของคุณ <b>${l.emp_name || '-'}</b> (${l.leave_type})</span></div>
-                    <div style="color:var(--text-muted); font-size:11.5px; text-align:right;">ลบโดย: <b>${l.deleted_by || 'ไม่ระบุ'}</b><br>${formatDateTime(l.deleted_at)}</div>
-                </div>
-            `).join('');
+            containerGen.innerHTML = buildDeleteLogRows(logsGen, l => l.leave_type);
         }
 
         if(logsVac.length === 0) {
             containerVac.innerHTML = `<p style="font-size:12.5px; color:var(--text-muted);">ไม่มีประวัติการลบข้อมูล</p>`;
         } else {
-            containerVac.innerHTML = logsVac.map(l => `
-                <div class="delete-log-row">
-                    <div style="display:flex; align-items:center; gap:10px;"><span class="delete-log-row-icon">${ICON_TRASH}</span> <span><b>ทะเบียนเลขที่ ${l.reg_num}</b> ของคุณ <b>${l.emp_name || '-'}</b> (ลาพักผ่อน)</span></div>
-                    <div style="color:var(--text-muted); font-size:11.5px; text-align:right;">ลบโดย: <b>${l.deleted_by || 'ไม่ระบุ'}</b><br>${formatDateTime(l.deleted_at)}</div>
-                </div>
-            `).join('');
+            containerVac.innerHTML = buildDeleteLogRows(logsVac, () => 'ลาพักผ่อน');
         }
     }
 
     function toggleDeleteLogPanel(type) {
-        const panel = document.getElementById(`delete-log-panel-${type}`);
-        panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+        const modal = document.getElementById(`deleteLogModal-${type}`);
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
     }
 
     async function handleFormSubmit(event) {
@@ -1139,11 +1200,20 @@
                 const oldRec = globalLeaveRecords.find(r => r.id === editId);
                 const currentVersion = globalEditLogs.filter(l => l.record_id === editId).length + 1;
                 let changes = [];
-                if(oldRec.reg_num !== payload.reg_num) changes.push(`เลขทะเบียน (${oldRec.reg_num}➡️${payload.reg_num})`);
-                if(oldRec.leave_type !== payload.leave_type) changes.push(`ประเภทลา (${oldRec.leave_type}➡️${payload.leave_type})`);
-                if(oldRec.total_days !== payload.total_days) changes.push(`จำนวนวัน (${oldRec.total_days}➡️${payload.total_days})`);
-                if(oldRec.emp_name !== payload.emp_name) changes.push(`เปลี่ยนชื่อพนักงาน`);
-                if(changes.length === 0) changes.push('แก้ไขรายละเอียดปลีกย่อย');
+                if(!isNumEqual(oldRec.reg_num, payload.reg_num)) changes.push(`เลขทะเบียน (${oldRec.reg_num} → ${payload.reg_num})`);
+                if(!isStrEqual(oldRec.doc_date, payload.doc_date)) changes.push(`ลงวันที่รายงาน (${formatThaiDate(oldRec.doc_date)} → ${formatThaiDate(payload.doc_date)})`);
+                if(!isStrEqual(oldRec.emp_prefix, payload.emp_prefix)) changes.push(`คำนำหน้าชื่อ (${oldRec.emp_prefix || '-'} → ${payload.emp_prefix || '-'})`);
+                if(!isStrEqual(oldRec.emp_name, payload.emp_name)) changes.push(`ชื่อพนักงาน (${oldRec.emp_name || '-'} → ${payload.emp_name || '-'})`);
+                if(!isStrEqual(oldRec.sup_name, payload.sup_name)) changes.push(`ผู้รับรายงาน (${oldRec.sup_name || '-'} → ${payload.sup_name || '-'})`);
+                if(!isStrEqual(oldRec.leave_type, payload.leave_type)) changes.push(`ประเภทลา (${oldRec.leave_type} → ${payload.leave_type})`);
+                if(!isStrEqual(oldRec.start_date, payload.start_date)) changes.push(`วันที่เริ่มลา (${formatThaiDate(oldRec.start_date)} → ${formatThaiDate(payload.start_date)})`);
+                if(!isStrEqual(oldRec.end_date, payload.end_date)) changes.push(`วันที่สิ้นสุดลา (${formatThaiDate(oldRec.end_date)} → ${formatThaiDate(payload.end_date)})`);
+                if(!!oldRec.half_day !== !!payload.half_day) changes.push(`ลาครึ่งวัน (${oldRec.half_day ? 'ใช่' : 'ไม่ใช่'} → ${payload.half_day ? 'ใช่' : 'ไม่ใช่'})`);
+                if(!isStrEqual(oldRec.half_time, payload.half_time) && payload.half_day) changes.push(`ช่วงเวลาครึ่งวัน (${oldRec.half_time || '-'} → ${payload.half_time || '-'})`);
+                if(!isNumEqual(oldRec.total_days, payload.total_days)) changes.push(`จำนวนวัน (${oldRec.total_days} → ${payload.total_days})`);
+                if(!isStrEqual(oldRec.action_dept, payload.action_dept)) changes.push(`หน่วยงานปฏิบัติการ (${oldRec.action_dept || '-'} → ${payload.action_dept || '-'})`);
+                if(!isStrEqual(oldRec.remark, payload.remark)) changes.push(`หมายเหตุ (${oldRec.remark || '-'} → ${payload.remark || '-'})`);
+                if(changes.length === 0) changes.push('แก้ไขรายละเอียดปลีกย่อย (ไม่มีการเปลี่ยนแปลงข้อมูลที่ระบบติดตาม)');
 
                 await fetch(`${SUPABASE_URL}/rest/v1/leave_edit_logs`, {
                     method: "POST",
@@ -1278,7 +1348,7 @@
             tabs[0].classList.add('active-sheet');
             document.getElementById('sheet-panel-general').classList.add('active-panel');
             document.getElementById('form-general-placeholder').appendChild(formElement);
-            selectType.innerHTML = `<option value="ลาป่วย">ลาป่วย</option><option value="ลากิจ">ลากิจ</option><option value="ยกเลิกวันลา">ยกเลิกวันลา</option>`;
+            selectType.innerHTML = `<option value="ลาป่วย">ลาป่วย</option><option value="ลากิจ">ลากิจ</option><option value="ลาคลอดบุตร">ลาคลอดบุตร</option><option value="ยกเลิกวันลา">ยกเลิกวันลา</option>`;
         } else if (sheetName === 'vacation') {
             tabs[1].classList.add('active-sheet');
             document.getElementById('sheet-panel-vacation').classList.add('active-panel');
@@ -1375,18 +1445,11 @@
 
     function openRangeModal() { document.getElementById('downloadModal').style.display = 'flex'; }
     function closeRangeModal() { document.getElementById('downloadModal').style.display = 'none'; }
-    function getBadgeClass(type) { return type === 'ลาป่วย' ? 'badge-sick' : type === 'ลากิจ' ? 'badge-personal' : type === 'ลาพักผ่อน' ? 'badge-vacation' : 'badge-cancel'; }
+    function getBadgeClass(type) { return type === 'ลาป่วย' ? 'badge-sick' : type === 'ลากิจ' ? 'badge-personal' : type === 'ลาคลอดบุตร' ? 'badge-maternity' : type === 'ลาพักผ่อน' ? 'badge-vacation' : 'badge-cancel'; }
     function getDeptClass(dept) { return dept === 'สอก' ? 'dept-sok' : dept === 'สวว' ? 'dept-swv' : dept === 'สวป' ? 'dept-swp' : dept === 'สวล' ? 'dept-swl' : 'dept-sst'; }
     function formatThaiDate(dateStr) { if (!dateStr) return '-'; const d = new Date(dateStr); if (isNaN(d.getTime())) return dateStr; return d.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: '2-digit' }); }
 
     function formatThaiDateRange(startStr, endStr) {
-        const d1 = new Date(startStr), d2 = new Date(endStr);
-        if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return `${formatThaiDate(startStr)} - ${formatThaiDate(endStr)}`;
-        const sameYear = d1.getFullYear() === d2.getFullYear();
-        if (sameYear) {
-            const shortStart = d1.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit' });
-            return `${shortStart} - ${formatThaiDate(endStr)}`;
-        }
         return `${formatThaiDate(startStr)} - ${formatThaiDate(endStr)}`;
     }
 
