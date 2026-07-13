@@ -207,7 +207,7 @@
             color: var(--color-primary-deep);
         }
         .reg-counter-card input {
-            width: 46px;
+            width: 52px;
             border: none;
             background: transparent;
             font-size: 14.5px;
@@ -215,6 +215,15 @@
             color: var(--color-primary-deep);
             outline: none;
             text-align: center;
+        }
+        .reg-counter-card select {
+            border: none;
+            background: transparent;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--color-primary-deep);
+            outline: none;
+            cursor: pointer;
         }
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .form-group.span-2 { grid-column: span 2; }
@@ -602,6 +611,10 @@
         <div class="header-controls">
             <button class="btn-modern-primary" onclick="openRangeModal()">พิมพ์รายงานทะเบียนรับ</button>
             <div class="reg-counter-card">
+                <span>ปีงบประมาณ:</span>
+                <select id="fiscal-year-select" onchange="handleYearFilterChange()"></select>
+            </div>
+            <div class="reg-counter-card">
                 <span>ทะเบียนถัดไป:</span>
                 <input type="number" id="global-next-reg" value="1" min="1" onchange="syncRegNumber()">
             </div>
@@ -747,7 +760,7 @@
 
         <div class="glass-panel">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                <h2>ทะเบียนใบลาป่วย/ลากิจ/ลาคลอดบุตร</h2>
+                <h2>ทะเบียนใบลาป่วย/ลากิจ/ลาคลอดบุตร <span id="table-fiscal-year-label" style="font-size:11.5px; font-weight:500; color:var(--text-muted);"></span></h2>
                 <div class="delete-history-btn-wrapper">
                     <button class="btn-delete-log-trigger" onclick="toggleDeleteLogPanel('general')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> ประวัติการลบรายการ</button>
                 </div>
@@ -792,7 +805,7 @@
 
         <div class="glass-panel">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-                <h2>ทะเบียนรับใบลาพักผ่อน</h2>
+                <h2>ทะเบียนรับใบลาพักผ่อน <span id="table-fiscal-year-label-vacation" style="font-size:11.5px; font-weight:500; color:var(--text-muted);"></span></h2>
                 <div class="delete-history-btn-wrapper">
                     <button class="btn-delete-log-trigger" onclick="toggleDeleteLogPanel('vacation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> ประวัติการลบรายการ</button>
                 </div>
@@ -875,6 +888,53 @@
     let globalLeaveRecords = [];
     let globalEditLogs = [];
     let globalDeleteLogs = [];
+
+    // ปีงบประมาณไทย เริ่ม 1 ต.ค. ถึง 30 ก.ย. ของปีถัดไป
+    // เช่น 1 ต.ค. 2568 - 30 ก.ย. 2569 นับเป็นปีงบประมาณ 2569
+    function getFiscalYear(dateStr) {
+        if (!dateStr) return null;
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return null;
+        const y = d.getFullYear();
+        const m = d.getMonth() + 1;
+        return (m >= 10) ? y + 1 : y;
+    }
+    function toBuddhistYear(y) { return y + 543; }
+    function getCurrentFiscalYear() { return getFiscalYear(new Date().toISOString().slice(0, 10)); }
+
+    let selectedFiscalYear = getCurrentFiscalYear();
+
+    function updateFiscalYearLabel() {
+        const text = `(ปีงบประมาณ ${toBuddhistYear(selectedFiscalYear)})`;
+        const label = document.getElementById('table-fiscal-year-label');
+        if (label) label.innerText = text;
+        const labelVac = document.getElementById('table-fiscal-year-label-vacation');
+        if (labelVac) labelVac.innerText = text;
+    }
+
+    function populateYearSelector() {
+        const yearsSet = new Set();
+        globalLeaveRecords.forEach(r => {
+            const fy = getFiscalYear(r.doc_date);
+            if (fy) yearsSet.add(fy);
+        });
+        yearsSet.add(getCurrentFiscalYear());
+        yearsSet.add(selectedFiscalYear);
+
+        const years = [...yearsSet].sort((a, b) => b - a);
+        const sel = document.getElementById('fiscal-year-select');
+        sel.innerHTML = years.map(y => `<option value="${y}">ปีงบประมาณ ${toBuddhistYear(y)}</option>`).join('');
+        sel.value = selectedFiscalYear;
+        updateFiscalYearLabel();
+    }
+
+    function handleYearFilterChange() {
+        selectedFiscalYear = parseInt(document.getElementById('fiscal-year-select').value) || getCurrentFiscalYear();
+        updateFiscalYearLabel();
+        renderTableData();
+        updateStatCards();
+        calculateNextRegNumbers();
+    }
 
     const ICON_CALENDAR = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`;
     const ICON_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`;
@@ -979,6 +1039,7 @@
 
             await fetchDeleteLogs();
 
+            populateYearSelector();
             renderTableData();
             updateStatCards();
             calculateNextRegNumbers();
@@ -1004,6 +1065,7 @@
     function calculateNextRegNumbers() {
         let maxGen = 0, maxVac = 0;
         globalLeaveRecords.forEach(r => {
+            if (getFiscalYear(r.doc_date) !== selectedFiscalYear) return;
             if (r.sheet_type === 'general' && r.reg_num > maxGen) maxGen = r.reg_num;
             if (r.sheet_type === 'vacation' && r.reg_num > maxVac) maxVac = r.reg_num;
         });
@@ -1055,6 +1117,7 @@
 
         globalLeaveRecords.forEach(record => {
             if (record.emp_name) employeeNames.add(record.emp_name);
+            if (getFiscalYear(record.doc_date) !== selectedFiscalYear) return;
             const isCancel = record.leave_type === 'ยกเลิกวันลา';
             const rowClass = isCancel ? 'class="row-cancel-highlight"' : '';
             const badgeClass = getBadgeClass(record.leave_type);
@@ -1327,7 +1390,7 @@
         const errorMsg = document.getElementById('reg-error-msg');
         const val = parseInt(regInput.value);
         if (!val) return false;
-        const isDup = globalLeaveRecords.some(r => r.reg_num === val && r.sheet_type === currentActiveSheet && r.id !== editId);
+        const isDup = globalLeaveRecords.some(r => r.reg_num === val && r.sheet_type === currentActiveSheet && r.id !== editId && getFiscalYear(r.doc_date) === selectedFiscalYear);
         if (isDup) {
             regInput.classList.add('duplicate-error'); errorMsg.style.display = 'block'; return true;
         } else {
@@ -1361,7 +1424,7 @@
 
     function updateStatCards() {
         if (currentActiveSheet === 'general') {
-            const genRecords = globalLeaveRecords.filter(r => r.sheet_type === 'general');
+            const genRecords = globalLeaveRecords.filter(r => r.sheet_type === 'general' && getFiscalYear(r.doc_date) === selectedFiscalYear);
             let sick = 0, personal = 0, cancel = 0;
             genRecords.forEach(r => {
                 if (r.leave_type === 'ลาป่วย') sick++;
@@ -1373,7 +1436,7 @@
             document.getElementById('stat-personal').innerText = personal;
             document.getElementById('stat-cancel').innerText = cancel;
         } else {
-            const vacRecords = globalLeaveRecords.filter(r => r.sheet_type === 'vacation');
+            const vacRecords = globalLeaveRecords.filter(r => r.sheet_type === 'vacation' && getFiscalYear(r.doc_date) === selectedFiscalYear);
             document.getElementById('stat-vacation-total').innerText = vacRecords.length;
         }
     }
