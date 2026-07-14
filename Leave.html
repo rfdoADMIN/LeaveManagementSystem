@@ -1554,15 +1554,26 @@
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
             <head>
             <meta charset="utf-8">
+            <meta name="ProgId" content="Word.Document">
+            <meta name="Generator" content="Microsoft Word 15">
+            <meta name="Originator" content="Microsoft Word 15">
+            <!--[if gte mso 9]>
+            <xml>
+                <w:WordDocument>
+                    <w:View>Print</w:View>
+                    <w:Zoom>100</w:Zoom>
+                    <w:DoNotOptimizeForBrowser/>
+                    <w:UpdateFields/>
+                </w:WordDocument>
+            </xml>
+            <![endif]-->
             <style>
                 @page Section1 {
                     size: 29.7cm 21cm;
                     mso-page-orientation: landscape;
                     margin: 1.3cm 1.5cm 1.6cm 1.5cm;
-                    mso-header-margin: .8cm;
-                    mso-footer-margin: .8cm;
+                    mso-header-margin: .3cm;
                     mso-header: h1;
-                    mso-footer: f1;
                 }
                 div.Section1 { page: Section1; }
                 body { font-family:'TH SarabunPSK', sans-serif; font-size:14pt; }
@@ -1573,22 +1584,18 @@
             </style>
             </head>
             <body>
-                <div style='mso-element:header' id=h1>
-                    <table class="header-table" style="width:100%;">
-                        <tr>
-                            <td style="text-align:left; font-weight:bold; font-size:16pt; border:none;">ทะเบียนรับใบลา</td>
-                            <td style="text-align:right; font-size:14pt; border:none;">พิมพ์เมื่อ ${printedAt}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div style='mso-element:footer' id=f1>
-                    <p style="text-align:right; font-size:14pt; margin:0;"><span style='mso-field-code:" PAGE "'>1</span>/<span style='mso-field-code:" NUMPAGES "'>1</span></p>
-                </div>
+                <div style='mso-element:header' id=h1></div>
 
                 <div class="Section1">
-                    <p style="text-align:center; font-size:15pt; font-weight:bold; margin-bottom:16px;">${filePrefix}</p>
                     <table class="report-table">
-                        <thead><tr><th>เลขทะเบียน</th><th>ลงวันที่</th><th>จาก</th><th>ถึง</th><th>ประเภทการลา</th><th>ลาวันที่</th><th>จำนวนวัน</th><th>การปฏิบัติ</th><th>หมายเหตุ</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th colspan="5" style="text-align:left; font-weight:bold; font-size:16pt; background-color:#ffffff; border:none;">ทะเบียนรับใบลา</th>
+                                <th colspan="4" style="text-align:right; font-weight:normal; font-size:14pt; background-color:#ffffff; border:none;">พิมพ์เมื่อ ${printedAt}</th>
+                            </tr>
+                            <tr><th colspan="9" style="text-align:center; font-size:15pt; background-color:#ffffff; border:none;">${filePrefix}</th></tr>
+                            <tr><th>เลขทะเบียน</th><th>ลงวันที่</th><th>จาก</th><th>ถึง</th><th>ประเภทการลา</th><th>ลาวันที่</th><th>จำนวนวัน</th><th>การปฏิบัติ</th><th>หมายเหตุ</th></tr>
+                        </thead>
                         <tbody>${rowsHtml}</tbody>
                     </table>
                 </div>
