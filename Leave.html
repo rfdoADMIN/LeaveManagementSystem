@@ -247,6 +247,33 @@
         }
         .form-group input.duplicate-error { border-color: var(--error-color) !important; background-color: #fdf4f4 !important; color: var(--error-color); }
         .error-msg-text { color: var(--error-color); font-size: 12px; margin-top: 5px; display: none; font-weight: 600; }
+
+        .date-field-wrap { position: relative; }
+        .date-text-input { padding-right: 44px !important; letter-spacing: 0.3px; }
+        .date-text-input.is-invalid-date { border-color: var(--error-color) !important; background-color: #fdf4f4 !important; color: var(--error-color); }
+        .date-native-hidden {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .date-picker-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            padding: 0;
+        }
+        .date-picker-btn:hover { background: #f1f6f3; color: var(--color-primary); }
+        .date-picker-btn svg { width: 17px; height: 17px; }
         
         .halfday-card {
             background: #fbfdfc;
@@ -354,6 +381,85 @@
         .name-fullname-input { flex-grow: 1; }
 
         .table-responsive-box { width: 100%; overflow-x: auto; border-radius: var(--radius-sub); border: 1px solid var(--glass-border); }
+
+        .table-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 16px 18px;
+            background: var(--color-mint-soft);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sub);
+        }
+        .toolbar-field { display: flex; flex-direction: column; gap: 6px; }
+        .toolbar-field label {
+            font-size: 11px; font-weight: 600; color: var(--text-muted);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .toolbar-field label svg { width: 12px; height: 12px; }
+        .toolbar-field input {
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-family: 'Sarabun', sans-serif;
+            background: #ffffff;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .toolbar-field input:focus { border-color: var(--color-primary); }
+        .toolbar-field.search-reg-field input { width: 160px; }
+        .toolbar-field .date-field-wrap { width: 150px; }
+        .toolbar-field .date-text-input { width: 100%; }
+        .toolbar-daterange { display: flex; align-items: center; gap: 8px; }
+        .toolbar-daterange span { font-size: 12px; color: var(--text-muted); margin-bottom: 9px; }
+        .btn-clear-filter {
+            background: #ffffff;
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-family: 'Sarabun', sans-serif;
+        }
+        .btn-clear-filter:hover { background: var(--error-bg-light); color: var(--error-color); border-color: var(--badge-cancel-border); }
+        .toolbar-result-count { font-size: 11.5px; color: var(--text-muted); margin-left: auto; align-self: center; }
+
+        .pagination-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--glass-border);
+        }
+        .pagination-info { font-size: 12px; color: var(--text-muted); }
+        .pagination-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .page-nav-btn, .page-num-btn {
+            border: 1px solid var(--glass-border);
+            background: #ffffff;
+            color: var(--text-dark);
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 7px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Sarabun', sans-serif;
+        }
+        .page-nav-btn:hover:not(:disabled), .page-num-btn:hover:not(.active-page) { background: var(--color-mint-soft); border-color: var(--color-primary); }
+        .page-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .page-num-btn.active-page { background: var(--color-primary); border-color: var(--color-primary); color: #ffffff; }
+        .empty-state-row td { text-align: center; padding: 44px 14px !important; color: var(--text-muted); font-size: 13.5px; }
         table { width: 100%; border-collapse: collapse; text-align: left; min-width: 1160px; background: #ffffff; table-layout: auto; }
         th {
             padding: 16px 14px;
@@ -370,6 +476,39 @@
         tbody tr.row-cancel-highlight { background-color: #fdf2f2 !important; }
         tbody tr.row-cancel-highlight td { color: #c45a5a !important; }
         tbody tr.row-cancel-highlight td.cell-reg { color: #b53e3e !important; }
+
+        tbody tr.entry-date-divider-row:hover { background-color: transparent; }
+        tbody tr.entry-date-divider-row td { padding: 12px 14px; border-bottom: none; text-align: center; }
+        
+        .entry-date-divider {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(100deg, var(--color-primary-deep) 0%, var(--color-primary) 100%);
+            color: #f3faf6;
+            font-weight: 700;
+            font-size: 12.5px;
+            padding: 8px 18px;
+            letter-spacing: 0.15px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(79, 122, 104, 0.15);
+        }
+        .entry-date-divider .divider-icon-wrap {
+            width: 20px; height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .entry-date-divider svg { width: 11px; height: 11px; flex-shrink: 0; }
+        .entry-date-divider .divider-count-badge {
+            margin-left: 6px;
+            background: rgba(255,255,255,0.18);
+            padding: 2px 8px;
+            border-radius: 50px;
+            font-size: 10.5px;
+            font-weight: 600;
+        }
         
         tbody td { padding: 14px; font-size: 13.5px; color: var(--text-dark); vertical-align: middle; }
         tbody td.cell-reg { font-weight: 700; color: var(--color-primary-deep); }
@@ -480,6 +619,20 @@
             gap: 5px;
         }
         .history-log-meta svg { width: 11px; height: 11px; flex-shrink: 0; opacity: 0.8; }
+        .history-change-list { margin-top: 4px; }
+        .history-change-item {
+            color: #2c3e50;
+            padding-left: 12px;
+            position: relative;
+            margin-top: 3px;
+        }
+        .history-change-item::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--color-primary);
+        }
+        .history-change-item:first-child { margin-top: 0; }
 
         .history-date-divider {
             display: flex;
@@ -640,7 +793,13 @@
                 </div>
                 <div class="form-group">
                     <label>ลงวันที่รายงาน</label>
-                    <input type="date" id="input-doc-date" required>
+                    <div class="date-field-wrap">
+                        <input type="text" id="input-doc-date-text" class="date-text-input" placeholder="วว/ดด/ปปปป" inputmode="numeric" maxlength="10" autocomplete="off" required>
+                        <button type="button" class="date-picker-btn" onclick="openDatePicker('input-doc-date')" aria-label="เลือกวันที่จากปฏิทิน">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        </button>
+                        <input type="date" id="input-doc-date" class="date-native-hidden" tabindex="-1">
+                    </div>
                 </div>
                 <div class="form-group span-2">
                     <label>จาก (ชื่อพนักงาน)</label>
@@ -668,11 +827,23 @@
                 </div>
                 <div class="form-group">
                     <label>เริ่มต้นตั้งแต่วันที่</label>
-                    <input type="date" id="input-start-date" required onchange="execDaysCalc()">
+                    <div class="date-field-wrap">
+                        <input type="text" id="input-start-date-text" class="date-text-input" placeholder="วว/ดด/ปปปป" inputmode="numeric" maxlength="10" autocomplete="off" required>
+                        <button type="button" class="date-picker-btn" onclick="openDatePicker('input-start-date')" aria-label="เลือกวันที่จากปฏิทิน">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        </button>
+                        <input type="date" id="input-start-date" class="date-native-hidden" tabindex="-1" onchange="execDaysCalc()">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>สิ้นสุดถึงวันที่</label>
-                    <input type="date" id="input-end-date" required onchange="execDaysCalc()">
+                    <div class="date-field-wrap">
+                        <input type="text" id="input-end-date-text" class="date-text-input" placeholder="วว/ดด/ปปปป" inputmode="numeric" maxlength="10" autocomplete="off" required>
+                        <button type="button" class="date-picker-btn" onclick="openDatePicker('input-end-date')" aria-label="เลือกวันที่จากปฏิทิน">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        </button>
+                        <input type="date" id="input-end-date" class="date-native-hidden" tabindex="-1" onchange="execDaysCalc()">
+                    </div>
                     <div class="error-msg-text" id="date-order-error-msg">วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น!</div>
                 </div>
                 
@@ -766,6 +937,37 @@
                 </div>
             </div>
             
+            <div class="table-toolbar">
+                <div class="toolbar-field search-reg-field">
+                    <label>ค้นหาเลขทะเบียน</label>
+                    <input type="text" inputmode="numeric" id="filter-reg-search-general" placeholder="พิมพ์เลขทะเบียน..." oninput="handleRegSearchInput('general', this.value)">
+                </div>
+                <div class="toolbar-daterange">
+                    <div class="toolbar-field">
+                        <label>วันที่ลงรับ ตั้งแต่</label>
+                        <div class="date-field-wrap">
+                            <input type="text" id="filter-date-start-general-text" class="date-text-input" placeholder="วว/ดด/ปปปป" inputmode="numeric" maxlength="10" autocomplete="off">
+                            <button type="button" class="date-picker-btn" onclick="openDatePicker('filter-date-start-general')" aria-label="เลือกวันที่จากปฏิทิน">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                            </button>
+                            <input type="date" id="filter-date-start-general" class="date-native-hidden" tabindex="-1" onchange="handleDateRangeChange('general')">
+                        </div>
+                    </div>
+                    <span>ถึง</span>
+                    <div class="toolbar-field">
+                        <label>&nbsp;</label>
+                        <div class="date-field-wrap">
+                            <input type="text" id="filter-date-end-general-text" class="date-text-input" placeholder="วว/ดด/ปปปป" inputmode="numeric" maxlength="10" autocomplete="off">
+                            <button type="button" class="date-picker-btn" onclick="openDatePicker('filter-date-end-general')" aria-label="เลือกวันที่จากปฏิทิน">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                            </button>
+                            <input type="date" id="filter-date-end-general" class="date-native-hidden" tabindex="-1" onchange="handleDateRangeChange('general')">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-clear-filter" onclick="clearTableFilters('general')">ล้างตัวกรอง</button>
+            </div>
+
             <div class="table-responsive-box">
                 <table id="mainLeaveTable">
                     <thead>
@@ -785,6 +987,7 @@
                     <tbody></tbody>
                 </table>
             </div>
+            <div class="pagination-bar" id="pagination-general"></div>
         </div>
     </div>
 
@@ -811,6 +1014,37 @@
                 </div>
             </div>
 
+            <div class="table-toolbar">
+                <div class="toolbar-field search-reg-field">
+                    <label>ค้นหาเลขทะเบียน</label>
+                    <input type="text" inputmode="numeric" id="filter-reg-search-vacation" placeholder="พิมพ์เลขทะเบียน..." oninput="handleRegSearchInput('vacation', this.value)">
+                </div>
+                <div class="toolbar-daterange">
+                    <div class="toolbar-field">
+                        <label>วันที่ลงรับ ตั้งแต่</label>
+                        <div class="date-field-wrap">
+                            <input type="text" id="filter-date-start-vacation-text" class="date-text-input" placeholder="วว/ดด/ปปปป" inputmode="numeric" maxlength="10" autocomplete="off">
+                            <button type="button" class="date-picker-btn" onclick="openDatePicker('filter-date-start-vacation')" aria-label="เลือกวันที่จากปฏิทิน">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                            </button>
+                            <input type="date" id="filter-date-start-vacation" class="date-native-hidden" tabindex="-1" onchange="handleDateRangeChange('vacation')">
+                        </div>
+                    </div>
+                    <span>ถึง</span>
+                    <div class="toolbar-field">
+                        <label>&nbsp;</label>
+                        <div class="date-field-wrap">
+                            <input type="text" id="filter-date-end-vacation-text" class="date-text-input" placeholder="วว/ดด/ปปปป" inputmode="numeric" maxlength="10" autocomplete="off">
+                            <button type="button" class="date-picker-btn" onclick="openDatePicker('filter-date-end-vacation')" aria-label="เลือกวันที่จากปฏิทิน">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                            </button>
+                            <input type="date" id="filter-date-end-vacation" class="date-native-hidden" tabindex="-1" onchange="handleDateRangeChange('vacation')">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-clear-filter" onclick="clearTableFilters('vacation')">ล้างตัวกรอง</button>
+            </div>
+
             <div class="table-responsive-box">
                 <table id="vacationLeaveTable">
                     <thead>
@@ -830,6 +1064,7 @@
                     <tbody></tbody>
                 </table>
             </div>
+            <div class="pagination-bar" id="pagination-vacation"></div>
         </div>
     </div>
 </div>
@@ -839,15 +1074,27 @@
 <div class="modal-overlay" id="downloadModal">
     <div class="modal-card">
         <h3>พิมพ์รายงานทะเบียนรับ</h3>
-        <p>โปรดระบุช่วงเลขทะเบียน</p>
+        <p>โปรดระบุช่วงวันที่รายงาน</p>
         <div class="modal-grid">
             <div class="form-group">
-                <label>ทะเบียนเริ่มต้น</label>
-                <input type="number" id="range-start-id" placeholder="ระบุเลขทะเบียนเริ่มต้น" min="1">
+                <label>วันที่เริ่มต้น</label>
+                <div class="date-field-wrap">
+                    <input type="text" id="print-start-date-text" class="date-text-input" placeholder="วว/ดด/ปปปป" inputmode="numeric" maxlength="10" autocomplete="off">
+                    <button type="button" class="date-picker-btn" onclick="openDatePicker('print-start-date')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </button>
+                    <input type="date" id="print-start-date" class="date-native-hidden" tabindex="-1">
+                </div>
             </div>
             <div class="form-group">
-                <label>ทะเบียนสิ้นสุด</label>
-                <input type="number" id="range-end-id" placeholder="ระบุเลขทะเบียนสิ้นสุด" min="1">
+                <label>วันที่สิ้นสุด</label>
+                <div class="date-field-wrap">
+                    <input type="text" id="print-end-date-text" class="date-text-input" placeholder="วว/ดด/ปปปป" inputmode="numeric" maxlength="10" autocomplete="off">
+                    <button type="button" class="date-picker-btn" onclick="openDatePicker('print-end-date')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    </button>
+                    <input type="date" id="print-end-date" class="date-native-hidden" tabindex="-1">
+                </div>
             </div>
         </div>
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
@@ -889,8 +1136,6 @@
     let globalEditLogs = [];
     let globalDeleteLogs = [];
 
-    // ปีงบประมาณไทย เริ่ม 1 ต.ค. ถึง 30 ก.ย. ของปีถัดไป
-    // เช่น 1 ต.ค. 2568 - 30 ก.ย. 2569 นับเป็นปีงบประมาณ 2569
     function getFiscalYear(dateStr) {
         if (!dateStr) return null;
         const d = new Date(dateStr);
@@ -940,12 +1185,18 @@
     const ICON_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`;
     const ICON_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>`;
 
+    function renderChangeDetailsList(changeDetails) {
+        if (!changeDetails) return '<div class="history-change-item">-</div>';
+        const items = changeDetails.includes('\n') ? changeDetails.split('\n') : changeDetails.split(', ');
+        return items.map(item => `<div class="history-change-item">${item}</div>`).join('');
+    }
+
     function buildHistoryTooltipHtml(matchLogs) {
         const sorted = [...matchLogs].sort((a, b) => (a.edit_version || 0) - (b.edit_version || 0));
         const items = sorted.map(l => `
             <div class="history-log-item">
                 <span class="history-log-version">ครั้งที่ ${l.edit_version} · โดย ${l.edited_by || 'ไม่ระบุ'}</span><br>
-                <span style="color:#2c3e50;">${l.change_details || '-'}</span>
+                <div class="history-change-list">${renderChangeDetailsList(l.change_details)}</div>
                 <div class="history-log-meta">${ICON_CLOCK} ${formatDateTime(l.edited_at)}</div>
             </div>
         `).join('');
@@ -1014,6 +1265,7 @@
         document.getElementById('current-user-display').innerText = loggedInName;
         
         initHistoryTooltipDelegation();
+        initDateFields();
         switchSheet('general');
         await fetchAllDataFromSupabase();
     };
@@ -1027,7 +1279,7 @@
 
     async function fetchAllDataFromSupabase() {
         try {
-            const resRecords = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?order=reg_num.asc`, {
+            const resRecords = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?order=created_at.desc,reg_num.desc`, {
                 method: "GET", headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}` }
             });
             if (resRecords.ok) globalLeaveRecords = await resRecords.json();
@@ -1088,9 +1340,6 @@
         return d.toLocaleDateString('th-TH', {day:'2-digit', month:'2-digit', year:'2-digit'}) + ' เวลา ' + d.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) + ' น.';
     }
 
-    // ใช้เทียบค่าตัวเลข โดยแปลงชนิดข้อมูลให้ตรงกันก่อนเสมอ
-    // (ป้องกันปัญหา Supabase ส่งค่าตัวเลขบางคอลัมน์กลับมาเป็น string เช่น "5" ขณะที่ค่าจากฟอร์มเป็น number 5
-    // ซึ่งทำให้ !== เข้าใจผิดว่าค่าต่างกัน หรือ === เข้าใจผิดว่าค่าเหมือนกันได้)
     function isNumEqual(a, b) {
         const na = (a === null || a === undefined || a === '') ? 0 : parseFloat(a);
         const nb = (b === null || b === undefined || b === '') ? 0 : parseFloat(b);
@@ -1098,8 +1347,6 @@
         return na === nb;
     }
 
-    // ใช้เทียบค่าข้อความ/วันที่ โดย trim ช่องว่างและมองค่าว่างกับ null/undefined เป็นค่าเดียวกัน
-    // และตัดเวลา/timezone ทิ้งถ้าเป็นรูปแบบวันที่ (เทียบเฉพาะ 10 ตัวแรก YYYY-MM-DD)
     function isStrEqual(a, b) {
         const sa = (a === null || a === undefined) ? '' : String(a).trim();
         const sb = (b === null || b === undefined) ? '' : String(b).trim();
@@ -1108,23 +1355,83 @@
         return da === db;
     }
 
-    function renderTableData() {
-        const generalBody = document.querySelector('#mainLeaveTable tbody');
-        const vacationBody = document.querySelector('#vacationLeaveTable tbody');
-        generalBody.innerHTML = '';
-        vacationBody.innerHTML = '';
-        const employeeNames = new Set();
+    const RECORDS_PER_PAGE = 50;
+    let tableFilters = {
+        general: { search: '', dateStart: '', dateEnd: '', page: 1 },
+        vacation: { search: '', dateStart: '', dateEnd: '', page: 1 }
+    };
 
-        globalLeaveRecords.forEach(record => {
-            if (record.emp_name) employeeNames.add(record.emp_name);
-            if (getFiscalYear(record.doc_date) !== selectedFiscalYear) return;
+    function getFilteredRecordsForSheet(sheetType) {
+        const f = tableFilters[sheetType];
+        return globalLeaveRecords.filter(r => {
+            if (r.sheet_type !== sheetType) return false;
+            if (getFiscalYear(r.doc_date) !== selectedFiscalYear) return false;
+            if (f.search) {
+                if (!String(r.reg_num).includes(f.search)) return false;
+            }
+            if (f.dateStart || f.dateEnd) {
+                const entryDate = r.created_at ? String(r.created_at).slice(0, 10) : null;
+                if (!entryDate) return false;
+                if (f.dateStart && entryDate < f.dateStart) return false;
+                if (f.dateEnd && entryDate > f.dateEnd) return false;
+            }
+            return true;
+        }).sort((a, b) => {
+            const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+            if (dateB !== dateA) return dateB - dateA;
+            return (b.reg_num || 0) - (a.reg_num || 0);
+        });
+    }
+
+    function countByEntryDate(list) {
+        const map = {};
+        list.forEach(r => {
+            const key = r.created_at ? formatThaiDate(r.created_at) : 'ไม่ระบุวันที่';
+            map[key] = (map[key] || 0) + 1;
+        });
+        return map;
+    }
+
+    function renderTableData() {
+        const employeeNames = new Set();
+        globalLeaveRecords.forEach(record => { if (record.emp_name) employeeNames.add(record.emp_name); });
+
+        renderSheetTable('general');
+        renderSheetTable('vacation');
+
+        const datalist = document.getElementById('emp-datalist');
+        datalist.innerHTML = '';
+        employeeNames.forEach(name => datalist.innerHTML += `<option value="${name}"></option>`);
+    }
+
+    function renderSheetTable(sheetType) {
+        const body = document.querySelector(sheetType === 'vacation' ? '#vacationLeaveTable tbody' : '#mainLeaveTable tbody');
+        const f = tableFilters[sheetType];
+        const filtered = getFilteredRecordsForSheet(sheetType);
+        const dateCounts = countByEntryDate(filtered);
+
+        const totalPages = Math.max(1, Math.ceil(filtered.length / RECORDS_PER_PAGE));
+        if (f.page > totalPages) f.page = totalPages;
+        if (f.page < 1) f.page = 1;
+        const startIdx = (f.page - 1) * RECORDS_PER_PAGE;
+        const pageItems = filtered.slice(startIdx, startIdx + RECORDS_PER_PAGE);
+
+        let lastEntryDate = null;
+        let html = '';
+
+        if (pageItems.length === 0) {
+            html = `<tr class="empty-state-row"><td colspan="10">ไม่พบข้อมูลที่ตรงกับเงื่อนไขที่ค้นหา</td></tr>`;
+        }
+
+        pageItems.forEach(record => {
             const isCancel = record.leave_type === 'ยกเลิกวันลา';
             const rowClass = isCancel ? 'class="row-cancel-highlight"' : '';
             const badgeClass = getBadgeClass(record.leave_type);
             const deptClass = getDeptClass(record.action_dept);
-            
-            let dateStr = record.start_date === record.end_date ? 
-                formatThaiDate(record.start_date) : 
+
+            let dateStr = record.start_date === record.end_date ?
+                formatThaiDate(record.start_date) :
                 formatThaiDateRange(record.start_date, record.end_date);
             if (record.half_day) dateStr += `<span class="halfday-tag">ครึ่งวัน (${record.half_time})</span>`;
 
@@ -1138,7 +1445,15 @@
                 `;
             }
 
-            const trHtml = `
+            const entryDateKey = record.created_at ? formatThaiDate(record.created_at) : 'ไม่ระบุวันที่';
+            let dividerHtml = '';
+            if (entryDateKey !== lastEntryDate) {
+                dividerHtml = `<tr class="entry-date-divider-row"><td colspan="10"><div class="entry-date-divider"><span class="divider-icon-wrap">${ICON_CALENDAR}</span> วันที่ลงรับ ${entryDateKey} <span class="divider-count-badge">${dateCounts[entryDateKey] || 0} รายการ</span></div></td></tr>`;
+                lastEntryDate = entryDateKey;
+            }
+
+            html += `
+                ${dividerHtml}
                 <tr ${rowClass}>
                     <td class="cell-reg">${record.reg_num}</td>
                     <td>${formatThaiDate(record.doc_date)}</td>
@@ -1148,6 +1463,7 @@
                             ${historyHtmlIcon}
                         </div>
                         <span class="creator-stamp-tag">บันทึกโดย: ${record.created_by || 'ไม่ระบุ'}</span>
+                        <span class="creator-stamp-tag">วันที่ลงรับ: ${formatThaiDate(record.created_at)}</span>
                     </td>
                     <td>${record.sup_name || 'ผอ.สวพ'}</td>
                     <td><span class="badge-type ${badgeClass}">${record.leave_type}</span></td>
@@ -1161,14 +1477,76 @@
                     </td>
                 </tr>
             `;
-
-            if (record.sheet_type === 'vacation') vacationBody.innerHTML += trHtml;
-            else generalBody.innerHTML += trHtml;
         });
 
-        const datalist = document.getElementById('emp-datalist');
-        datalist.innerHTML = '';
-        employeeNames.forEach(name => datalist.innerHTML += `<option value="${name}"></option>`);
+        body.innerHTML = html;
+        renderPaginationBar(sheetType, filtered.length, f.page, totalPages);
+    }
+
+    function renderPaginationBar(sheetType, totalItems, currentPage, totalPages) {
+        const container = document.getElementById(`pagination-${sheetType}`);
+        if (!container) return;
+        if (totalItems === 0) { container.innerHTML = ''; return; }
+
+        const startItem = (currentPage - 1) * RECORDS_PER_PAGE + 1;
+        const endItem = Math.min(currentPage * RECORDS_PER_PAGE, totalItems);
+
+        const maxButtons = 7;
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+        let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+        startPage = Math.max(1, endPage - maxButtons + 1);
+
+        let pageButtons = '';
+        for (let p = startPage; p <= endPage; p++) {
+            pageButtons += `<button class="page-num-btn ${p === currentPage ? 'active-page' : ''}" onclick="goToPage('${sheetType}', ${p})">${p}</button>`;
+        }
+
+        container.innerHTML = `
+            <div class="pagination-info">แสดง ${startItem}-${endItem} จากทั้งหมด ${totalItems} รายการ</div>
+            <div class="pagination-controls">
+                <button class="page-nav-btn" onclick="goToPage('${sheetType}', ${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>ก่อนหน้า</button>
+                ${pageButtons}
+                <button class="page-nav-btn" onclick="goToPage('${sheetType}', ${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>ถัดไป</button>
+            </div>
+        `;
+    }
+
+    function goToPage(sheetType, page) {
+        tableFilters[sheetType].page = page;
+        renderSheetTable(sheetType);
+        const panelId = sheetType === 'vacation' ? 'sheet-panel-vacation' : 'sheet-panel-general';
+        const box = document.querySelector(`#${panelId} .table-responsive-box`);
+        if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function handleRegSearchInput(sheetType, value) {
+        tableFilters[sheetType].search = value.replace(/[^0-9]/g, '');
+        tableFilters[sheetType].page = 1;
+        renderSheetTable(sheetType);
+    }
+
+    function handleDateRangeChange(sheetType) {
+        const startEl = document.getElementById(`filter-date-start-${sheetType}`);
+        const endEl = document.getElementById(`filter-date-end-${sheetType}`);
+        tableFilters[sheetType].dateStart = startEl ? startEl.value : '';
+        tableFilters[sheetType].dateEnd = endEl ? endEl.value : '';
+        tableFilters[sheetType].page = 1;
+        renderSheetTable(sheetType);
+    }
+
+    function clearTableFilters(sheetType) {
+        tableFilters[sheetType] = { search: '', dateStart: '', dateEnd: '', page: 1 };
+        const searchEl = document.getElementById(`filter-reg-search-${sheetType}`);
+        const startEl = document.getElementById(`filter-date-start-${sheetType}`);
+        const endEl = document.getElementById(`filter-date-end-${sheetType}`);
+        const startTextEl = document.getElementById(`filter-date-start-${sheetType}-text`);
+        const endTextEl = document.getElementById(`filter-date-end-${sheetType}-text`);
+        if (searchEl) searchEl.value = '';
+        if (startEl) startEl.value = '';
+        if (endEl) endEl.value = '';
+        if (startTextEl) startTextEl.value = '';
+        if (endTextEl) endTextEl.value = '';
+        renderSheetTable(sheetType);
     }
 
     function buildDeleteLogRows(logs, leaveTypeLabelFn) {
@@ -1281,7 +1659,7 @@
                 await fetch(`${SUPABASE_URL}/rest/v1/leave_edit_logs`, {
                     method: "POST",
                     headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ record_id: editId, edited_by: currentUser, edit_version: currentVersion, change_details: changes.join(', ') })
+                    body: JSON.stringify({ record_id: editId, edited_by: currentUser, edit_version: currentVersion, change_details: changes.join('\n') })
                 });
 
                 response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?id=eq.${editId}`, {
@@ -1333,6 +1711,7 @@
         document.getElementById('input-total-days').value = formatDaysDisplay(record.total_days);
         document.getElementById('input-action-dept').value = record.action_dept;
         document.getElementById('input-remark').value = record.remark || '';
+        refreshAllDateFields();
 
         document.getElementById('btn-cancel-edit-mode').style.display = 'inline-block';
         document.getElementById('btn-submit-main').innerText = 'อัปเดตข้อมูลเก่า';
@@ -1383,6 +1762,7 @@
         document.getElementById('btn-cancel-edit-mode').style.display = 'none';
         document.getElementById('btn-submit-main').innerText = 'บันทึกข้อมูลเข้าระบบ';
         calculateNextRegNumbers();
+        refreshAllDateFields();
     }
 
     function validateDuplicateReg(editId = '') {
@@ -1507,22 +1887,121 @@
     }
 
     function openRangeModal() { document.getElementById('downloadModal').style.display = 'flex'; }
-    function closeRangeModal() { document.getElementById('downloadModal').style.display = 'none'; }
+    function closeRangeModal() { 
+        document.getElementById('downloadModal').style.display = 'none'; 
+        document.getElementById('print-start-date').value = '';
+        document.getElementById('print-end-date').value = '';
+        document.getElementById('print-start-date-text').value = '';
+        document.getElementById('print-end-date-text').value = '';
+    }
     function getBadgeClass(type) { return type === 'ลาป่วย' ? 'badge-sick' : type === 'ลากิจ' ? 'badge-personal' : type === 'ลาคลอดบุตร' ? 'badge-maternity' : type === 'ลาพักผ่อน' ? 'badge-vacation' : 'badge-cancel'; }
     function getDeptClass(dept) { return dept === 'สอก' ? 'dept-sok' : dept === 'สวว' ? 'dept-swv' : dept === 'สวป' ? 'dept-swp' : dept === 'สวล' ? 'dept-swl' : 'dept-sst'; }
     function formatThaiDate(dateStr) { if (!dateStr) return '-'; const d = new Date(dateStr); if (isNaN(d.getTime())) return dateStr; return d.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: '2-digit' }); }
+
+    const DATE_FIELD_IDS = ['input-doc-date', 'input-start-date', 'input-end-date', 'filter-date-start-general', 'filter-date-end-general', 'filter-date-start-vacation', 'filter-date-end-vacation', 'print-start-date', 'print-end-date'];
+
+    function isoToDisplayDate(iso) {
+        if (!iso) return '';
+        const parts = iso.split('-');
+        if (parts.length !== 3) return '';
+        const [y, m, d] = parts;
+        return `${d}/${m}/${y}`;
+    }
+
+    function displayDateToIso(str) {
+        const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec((str || '').trim());
+        if (!match) return null;
+        const d = parseInt(match[1], 10), m = parseInt(match[2], 10), y = parseInt(match[3], 10);
+        if (m < 1 || m > 12 || y < 1000 || y > 9999) return null;
+        const daysInMonth = new Date(y, m, 0).getDate();
+        if (d < 1 || d > daysInMonth) return null;
+        return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+
+    function autoSlashDateInput(raw) {
+        const digits = raw.replace(/\D/g, '').slice(0, 8);
+        if (digits.length > 4) return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+        if (digits.length > 2) return digits.slice(0, 2) + '/' + digits.slice(2);
+        return digits;
+    }
+
+    function syncDateTextFromHidden(fieldId) {
+        const hidden = document.getElementById(fieldId);
+        const text = document.getElementById(fieldId + '-text');
+        if (!hidden || !text) return;
+        text.value = isoToDisplayDate(hidden.value);
+        text.classList.remove('is-invalid-date');
+    }
+
+    function initDateFields() {
+        DATE_FIELD_IDS.forEach(fieldId => {
+            const hidden = document.getElementById(fieldId);
+            const text = document.getElementById(fieldId + '-text');
+            if (!hidden || !text) return;
+
+            text.addEventListener('input', () => {
+                const atEnd = text.selectionStart === text.value.length;
+                text.value = autoSlashDateInput(text.value);
+                if (atEnd) text.setSelectionRange(text.value.length, text.value.length);
+                const iso = displayDateToIso(text.value);
+                if (iso) {
+                    hidden.value = iso;
+                    hidden.dispatchEvent(new Event('change', { bubbles: true }));
+                    text.classList.remove('is-invalid-date');
+                }
+            });
+
+            text.addEventListener('blur', () => {
+                if (text.value.trim() === '') { hidden.value = ''; text.classList.remove('is-invalid-date'); return; }
+                const iso = displayDateToIso(text.value);
+                if (!iso) {
+                    text.classList.add('is-invalid-date');
+                } else {
+                    hidden.value = iso;
+                    text.value = isoToDisplayDate(iso);
+                    hidden.dispatchEvent(new Event('change', { bubbles: true }));
+                    text.classList.remove('is-invalid-date');
+                }
+            });
+
+            hidden.addEventListener('change', () => syncDateTextFromHidden(fieldId));
+        });
+    }
+
+    function openDatePicker(fieldId) {
+        const hidden = document.getElementById(fieldId);
+        if (!hidden) return;
+        try {
+            if (typeof hidden.showPicker === 'function') { hidden.showPicker(); return; }
+        } catch (e) { }
+        hidden.focus();
+    }
+
+    function refreshAllDateFields() { DATE_FIELD_IDS.forEach(syncDateTextFromHidden); }
 
     function formatThaiDateRange(startStr, endStr) {
         return `${formatThaiDate(startStr)} - ${formatThaiDate(endStr)}`;
     }
 
     function generateWordReport() {
-        const startId = parseInt(document.getElementById('range-start-id').value) || 1;
-        const endId = parseInt(document.getElementById('range-end-id').value) || 1;
-        if (endId < startId) { alert('เลขทะเบียนสิ้นสุดต้องไม่น้อยกว่าทะเบียนเริ่มต้น'); return; }
+        const startDateVal = document.getElementById('print-start-date').value;
+        const endDateVal = document.getElementById('print-end-date').value;
+        
+        if (!startDateVal || !endDateVal) { alert('กรุณาระบุช่วงวันที่เริ่มต้นและสิ้นสุดให้ครบถ้วน'); return; }
+        if (endDateVal < startDateVal) { alert('วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่มต้น'); return; }
 
-        const filtered = globalLeaveRecords.filter(r => r.sheet_type === currentActiveSheet && r.reg_num >= startId && r.reg_num <= endId);
-        if (filtered.length === 0) { alert('ไม่พบข้อมูลทะเบียนในช่วงที่ระบุ'); return; }
+        const filtered = globalLeaveRecords.filter(r => 
+            r.sheet_type === currentActiveSheet && 
+            r.doc_date >= startDateVal && 
+            r.doc_date <= endDateVal
+        );
+        
+        if (filtered.length === 0) { alert('ไม่พบข้อมูลทะเบียนใบลาในช่วงวันที่ระบุ'); return; }
+
+        filtered.sort((a, b) => {
+            if (a.doc_date !== b.doc_date) return a.doc_date.localeCompare(b.doc_date);
+            return a.reg_num - b.reg_num;
+        });
 
         let filePrefix = currentActiveSheet === 'general' ? 'ทะเบียนใบลาป่วย / ลากิจ / ลาคลอดบุตร' : 'ทะเบียนใบลาพักผ่อน';
         let rowsHtml = '';
@@ -1606,7 +2085,13 @@
         const blob = new Blob(['\ufeff' + htmlPayload], { type: 'application/msword' });
         const url = URL.createObjectURL(blob);
         const aLink = document.createElement('a');
-        aLink.href = url; aLink.download = `${filePrefix}_${startId}_ถึง_${endId}.doc`;
+        aLink.href = url;
+        
+
+        const startStringFormatted = isoToDisplayDate(startDateVal).replace(/\//g, '-');
+        const endStringFormatted = isoToDisplayDate(endDateVal).replace(/\//g, '-');
+        aLink.download = `${filePrefix}_วันที่_${startStringFormatted}_ถึง_${endStringFormatted}.doc`;
+        
         document.body.appendChild(aLink); aLink.click(); document.body.removeChild(aLink);
         closeRangeModal();
     }
