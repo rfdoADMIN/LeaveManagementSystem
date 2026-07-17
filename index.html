@@ -66,6 +66,12 @@
         .toggle-visibility:hover { background: #f1f6f3; color: var(--color-primary); }
         .toggle-visibility svg { width: 19px; height: 19px; }
 
+        /* ปิดไอคอนแสดง/ซ่อนรหัสผ่านที่มากับเบราว์เซอร์เอง (Edge/IE) ไม่ให้ซ้อนกับไอคอนตาที่ทำเอง */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear { display: none; width: 0; height: 0; }
+        input[type="text"]::-ms-reveal,
+        input[type="text"]::-ms-clear { display: none; width: 0; height: 0; }
+
         .form-error { display: none; align-items: center; gap: 8px; background: #fdf3f3; border: 1px solid #f3d9d9; color: var(--error-color); font-size: 13px; font-weight: 500; padding: 11px 14px; border-radius: var(--radius-md); margin-bottom: 18px; }
 
         button[type="submit"] { width: 100%; padding: 14px; border: none; border-radius: var(--radius-md); font-size: 15.5px; font-weight: 600; color: white; background-color: var(--color-primary); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
