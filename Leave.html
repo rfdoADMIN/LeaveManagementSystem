@@ -1597,88 +1597,127 @@
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
     }
 
-    async function handleFormSubmit(event) {
-        event.preventDefault();
-        const editId = document.getElementById('active-edit-row-id').value;
-        const regNum = parseInt(document.getElementById('input-reg-num').value);
-        if (validateDuplicateReg(editId)) { alert('เลขทะเบียนนี้ถูกใช้งานไปแล้วในระบบ'); return; }
-
-        const prefixSelect = document.getElementById('input-emp-prefix').value;
-        const emp_prefix = prefixSelect === 'CUSTOM_OTHER' ? document.getElementById('input-custom-prefix').value : prefixSelect;
-        
-        let finalDays = 0;
-        const totalDaysString = document.getElementById('input-total-days').value;
-        if (totalDaysString.includes("1/2")) {
-            const parts = totalDaysString.split(" ");
-            finalDays = parts.length === 2 ? parseFloat(parts[0]) + 0.5 : 0.5;
-        } else {
-            finalDays = parseFloat(totalDaysString) || 0;
-        }
-
-        const currentUser = localStorage.getItem('loggedInUser') || "ผู้ดูแลระบบ";
-
-        const payload = {
-            reg_num: regNum,
-            doc_date: document.getElementById('input-doc-date').value,
-            emp_prefix: emp_prefix,
-            emp_name: document.getElementById('input-emp-name').value,
-            sup_name: document.getElementById('input-sup-name').value,
-            leave_type: document.getElementById('input-leave-type').value,
-            start_date: document.getElementById('input-start-date').value,
-            end_date: document.getElementById('input-end-date').value,
-            half_day: document.getElementById('check-half-day').checked,
-            half_time: document.getElementById('check-half-day').checked ? document.getElementById('select-half-time').value : null,
-            total_days: finalDays,
-            action_dept: document.getElementById('input-action-dept').value,
-            remark: document.getElementById('input-remark').value,
-            sheet_type: currentActiveSheet,
-            created_by: currentUser
+    function buildEditChangeDetails(oldRecord, payload) {
+        const changes = [];
+        const pushIfDiff = (label, oldVal, newVal) => {
+            const a = (oldVal ?? '').toString().trim();
+            const b = (newVal ?? '').toString().trim();
+            if (a !== b) changes.push(`${label}: ${a || '-'} → ${b || '-'}`);
         };
 
-        try {
-            let response;
-            if (editId) {
-                const oldRec = globalLeaveRecords.find(r => r.id === editId);
-                const currentVersion = globalEditLogs.filter(l => l.record_id === editId).length + 1;
-                let changes = [];
-                if(!isNumEqual(oldRec.reg_num, payload.reg_num)) changes.push(`เลขทะเบียน (${oldRec.reg_num} → ${payload.reg_num})`);
-                if(!isStrEqual(oldRec.doc_date, payload.doc_date)) changes.push(`ลงวันที่รายงาน (${formatThaiDate(oldRec.doc_date)} → ${formatThaiDate(payload.doc_date)})`);
-                if(!isStrEqual(oldRec.emp_prefix, payload.emp_prefix)) changes.push(`คำนำหน้าชื่อ (${oldRec.emp_prefix || '-'} → ${payload.emp_prefix || '-'})`);
-                if(!isStrEqual(oldRec.emp_name, payload.emp_name)) changes.push(`ชื่อพนักงาน (${oldRec.emp_name || '-'} → ${payload.emp_name || '-'})`);
-                if(!isStrEqual(oldRec.sup_name, payload.sup_name)) changes.push(`ผู้รับรายงาน (${oldRec.sup_name || '-'} → ${payload.sup_name || '-'})`);
-                if(!isStrEqual(oldRec.leave_type, payload.leave_type)) changes.push(`ประเภทลา (${oldRec.leave_type} → ${payload.leave_type})`);
-                if(!isStrEqual(oldRec.start_date, payload.start_date)) changes.push(`วันที่เริ่มลา (${formatThaiDate(oldRec.start_date)} → ${formatThaiDate(payload.start_date)})`);
-                if(!isStrEqual(oldRec.end_date, payload.end_date)) changes.push(`วันที่สิ้นสุดลา (${formatThaiDate(oldRec.end_date)} → ${formatThaiDate(payload.end_date)})`);
-                if(!!oldRec.half_day !== !!payload.half_day) changes.push(`ลาครึ่งวัน (${oldRec.half_day ? 'ใช่' : 'ไม่ใช่'} → ${payload.half_day ? 'ใช่' : 'ไม่ใช่'})`);
-                if(!isStrEqual(oldRec.half_time, payload.half_time) && payload.half_day) changes.push(`ช่วงเวลาครึ่งวัน (${oldRec.half_time || '-'} → ${payload.half_time || '-'})`);
-                if(!isNumEqual(oldRec.total_days, payload.total_days)) changes.push(`จำนวนวัน (${oldRec.total_days} → ${payload.total_days})`);
-                if(!isStrEqual(oldRec.action_dept, payload.action_dept)) changes.push(`หน่วยงานปฏิบัติการ (${oldRec.action_dept || '-'} → ${payload.action_dept || '-'})`);
-                if(!isStrEqual(oldRec.remark, payload.remark)) changes.push(`หมายเหตุ (${oldRec.remark || '-'} → ${payload.remark || '-'})`);
-                if(changes.length === 0) changes.push('แก้ไขรายละเอียดปลีกย่อย (ไม่มีการเปลี่ยนแปลงข้อมูลที่ระบบติดตาม)');
+        pushIfDiff('เลขทะเบียน', oldRecord.reg_num, payload.reg_num);
+        pushIfDiff('วันที่ลงทะเบียน', formatThaiDate(oldRecord.doc_date), formatThaiDate(payload.doc_date));
+        pushIfDiff('ชื่อ-สกุล', `${oldRecord.emp_prefix || ''}${oldRecord.emp_name || ''}`, `${payload.emp_prefix || ''}${payload.emp_name || ''}`);
+        pushIfDiff('ผู้บังคับบัญชา', oldRecord.sup_name, payload.sup_name);
+        pushIfDiff('ประเภทการลา', oldRecord.leave_type, payload.leave_type);
+        pushIfDiff('วันที่เริ่มลา', formatThaiDate(oldRecord.start_date), formatThaiDate(payload.start_date));
+        pushIfDiff('วันที่สิ้นสุดลา', formatThaiDate(oldRecord.end_date), formatThaiDate(payload.end_date));
+        pushIfDiff('ลาครึ่งวัน', oldRecord.half_day ? (oldRecord.half_time || 'ครึ่งวัน') : 'ไม่ใช่', payload.half_day ? (payload.half_time || 'ครึ่งวัน') : 'ไม่ใช่');
+        pushIfDiff('จำนวนวัน', oldRecord.total_days, payload.total_days);
+        pushIfDiff('การปฏิบัติ', oldRecord.action_dept, payload.action_dept);
+        pushIfDiff('หมายเหตุ', oldRecord.remark, payload.remark);
 
-                await fetch(`${SUPABASE_URL}/rest/v1/leave_edit_logs`, {
-                    method: "POST",
-                    headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ record_id: editId, edited_by: currentUser, edit_version: currentVersion, change_details: changes.join('\n') })
-                });
-
-                response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?id=eq.${editId}`, {
-                    method: "PATCH",
-                    headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-            } else {
-                response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records`, {
-                    method: "POST",
-                    headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-            }
-
-            if (response.ok) { exitEditMode(); await fetchAllDataFromSupabase(); } 
-            else { alert('ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง'); }
-        } catch (error) { console.error(error); }
+        return changes.length ? changes.join('\n') : 'ไม่มีการเปลี่ยนแปลงข้อมูล';
     }
+
+    async function handleFormSubmit(event) {
+    event.preventDefault();
+    const editId = document.getElementById('active-edit-row-id').value; //[cite: 1]
+    const prefixSelect = document.getElementById('input-emp-prefix').value; //[cite: 1]
+    const emp_prefix = prefixSelect === 'CUSTOM_OTHER' ? document.getElementById('input-custom-prefix').value : prefixSelect; //[cite: 1]
+    
+    let finalDays = 0; //[cite: 1]
+    const totalDaysString = document.getElementById('input-total-days').value; //[cite: 1]
+    if (totalDaysString.includes("1/2")) { //[cite: 1]
+        const parts = totalDaysString.split(" "); //[cite: 1]
+        finalDays = parts.length === 2 ? 0.5 : parseFloat(parts[0]) + 0.5; //[cite: 1]
+    } else {
+        finalDays = parseFloat(totalDaysString) || 0; //[cite: 1]
+    }
+
+    const currentUser = localStorage.getItem('loggedInUser') || "ผู้ดูแลระบบ"; //[cite: 1]
+
+    // ดึงค่า reg_num จาก input (ใช้เฉพาะกรณีแก้ไข)
+    const inputRegNum = parseInt(document.getElementById('input-reg-num').value) || 0;
+
+    // เก็บข้อมูลเดิมไว้เทียบตอนแก้ไข (สำหรับบันทึกประวัติการแก้ไข)
+    const oldRecordSnapshot = editId ? globalLeaveRecords.find(r => r.id === editId) : null;
+
+    const payload = {
+        // หากเป็นสร้างใหม่ (ไม่มี editId) ให้ใส่ 0 เพื่อให้ Trigger รันเลขถัดไปให้อัตโนมัติ
+        reg_num: editId ? inputRegNum : 0, 
+        doc_date: document.getElementById('input-doc-date').value, //[cite: 1]
+        emp_prefix: emp_prefix, //[cite: 1]
+        emp_name: document.getElementById('input-emp-name').value, //[cite: 1]
+        sup_name: document.getElementById('input-sup-name').value, //[cite: 1]
+        leave_type: document.getElementById('input-leave-type').value, //[cite: 1]
+        start_date: document.getElementById('input-start-date').value, //[cite: 1]
+        end_date: document.getElementById('input-end-date').value, //[cite: 1]
+        half_day: document.getElementById('check-half-day').checked, //[cite: 1]
+        half_time: document.getElementById('check-half-day').checked ? document.getElementById('select-half-time').value : null, //[cite: 1]
+        total_days: finalDays, //[cite: 1]
+        action_dept: document.getElementById('input-action-dept').value, //[cite: 1]
+        remark: document.getElementById('input-remark').value, //[cite: 1]
+        sheet_type: currentActiveSheet //[cite: 1]
+    };
+
+    if (!editId) {
+        // ใส่ created_by เฉพาะตอนสร้างรายการใหม่เท่านั้น เพื่อไม่ให้ทับชื่อผู้บันทึกเดิมตอนแก้ไข
+        payload.created_by = currentUser;
+    }
+
+    try {
+        let response;
+        if (editId) {
+            // โหมดแก้ไขรายการเดิม (PATCH)
+            response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?id=eq.${editId}`, {
+                method: "PATCH",
+                headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+        } else {
+            // โหมดสร้างรายการใหม่ (POST) - Database จะแจกเลขทะเบียนให้อัตโนมัติ
+            response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records`, {
+                method: "POST",
+                headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+        }
+
+        if (response.ok) { 
+            if (editId && oldRecordSnapshot) {
+                try {
+                    const existingVersions = globalEditLogs.filter(l => l.record_id === editId).length;
+                    await fetch(`${SUPABASE_URL}/rest/v1/leave_edit_logs`, {
+                        method: "POST",
+                        headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            record_id: editId,
+                            edited_by: currentUser,
+                            edit_version: existingVersions + 1,
+                            change_details: buildEditChangeDetails(oldRecordSnapshot, payload)
+                        })
+                    });
+                } catch (logError) {
+                    console.error('บันทึกประวัติการแก้ไขไม่สำเร็จ:', logError);
+                }
+            }
+            alert('บันทึกข้อมูลเรียบร้อยแล้ว!');
+            exitEditMode(); 
+            await fetchAllDataFromSupabase(); 
+        } else { 
+            const errorResult = await response.json();
+            if (errorResult.code === '23505') {
+                alert('⚠️ เลขทะเบียนนี้ถูกผู้อื่นใช้งานไปแล้ว ระบบดึงข้อมูลใหม่ให้แล้ว กรุณากดบันทึกอีกครั้ง');
+                await fetchAllDataFromSupabase();
+            } else {
+                alert('ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง'); 
+            }
+        }
+    } catch (error) { 
+        console.error(error); 
+    }
+}
 
     function enterEditMode(id) {
         const record = globalLeaveRecords.find(r => r.id === id);
@@ -1709,6 +1748,7 @@
         if (record.half_day) document.getElementById('select-half-time').value = record.half_time || '08.30 - 12.00 น.';
         
         document.getElementById('input-total-days').value = formatDaysDisplay(record.total_days);
+        execDaysCalc(); // คำนวณจำนวนวันใหม่จากวันที่จริงทันที เผื่อค่าที่บันทึกไว้เดิมผิดพลาด
         document.getElementById('input-action-dept').value = record.action_dept;
         document.getElementById('input-remark').value = record.remark || '';
         refreshAllDateFields();
