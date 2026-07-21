@@ -2030,16 +2030,21 @@
         if (!startDateVal || !endDateVal) { alert('กรุณาระบุช่วงวันที่เริ่มต้นและสิ้นสุดให้ครบถ้วน'); return; }
         if (endDateVal < startDateVal) { alert('วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่มต้น'); return; }
 
-        const filtered = globalLeaveRecords.filter(r => 
-            r.sheet_type === currentActiveSheet && 
-            r.doc_date >= startDateVal && 
-            r.doc_date <= endDateVal
-        );
+        // เปลี่ยนมาคัดกรองตามวันที่ลงรับ (created_at)
+        const filtered = globalLeaveRecords.filter(r => {
+            if (r.sheet_type !== currentActiveSheet) return false;
+            const entryDate = r.created_at ? String(r.created_at).slice(0, 10) : null;
+            if (!entryDate) return false;
+            return entryDate >= startDateVal && entryDate <= endDateVal;
+        });
         
-        if (filtered.length === 0) { alert('ไม่พบข้อมูลทะเบียนใบลาในช่วงวันที่ระบุ'); return; }
+        if (filtered.length === 0) { alert('ไม่พบข้อมูลทะเบียนใบลาตามวันที่ลงรับในช่วงเวลาที่ระบุ'); return; }
 
+        // เรียงลำดับตามวันที่ลงรับ และเลขทะเบียน
         filtered.sort((a, b) => {
-            if (a.doc_date !== b.doc_date) return a.doc_date.localeCompare(b.doc_date);
+            const dateA = a.created_at ? String(a.created_at).slice(0, 10) : '';
+            const dateB = b.created_at ? String(b.created_at).slice(0, 10) : '';
+            if (dateA !== dateB) return dateA.localeCompare(dateB);
             return a.reg_num - b.reg_num;
         });
 
@@ -2109,7 +2114,7 @@
                     <table class="report-table">
                         <thead>
                             <tr>
-                                <th colspan="5" style="text-align:left; font-weight:bold; font-size:16pt; background-color:#ffffff; border:none;">ทะเบียนรับใบลา</th>
+                                <th colspan="5" style="text-align:left; font-weight:bold; font-size:16pt; background-color:#ffffff; border:none;">ทะเบียนรับใบลา (ตามวันที่ลงรับ)</th>
                                 <th colspan="4" style="text-align:right; font-weight:normal; font-size:14pt; background-color:#ffffff; border:none;">พิมพ์เมื่อ ${printedAt}</th>
                             </tr>
                             <tr><th colspan="9" style="text-align:center; font-size:15pt; background-color:#ffffff; border:none;">${filePrefix}</th></tr>
@@ -2127,10 +2132,9 @@
         const aLink = document.createElement('a');
         aLink.href = url;
         
-
         const startStringFormatted = isoToDisplayDate(startDateVal).replace(/\//g, '-');
         const endStringFormatted = isoToDisplayDate(endDateVal).replace(/\//g, '-');
-        aLink.download = `${filePrefix}_วันที่_${startStringFormatted}_ถึง_${endStringFormatted}.doc`;
+        aLink.download = `${filePrefix}_วันที่ลงรับ_${startStringFormatted}_ถึง_${endStringFormatted}.doc`;
         
         document.body.appendChild(aLink); aLink.click(); document.body.removeChild(aLink);
         closeRangeModal();
