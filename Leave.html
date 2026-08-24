@@ -712,11 +712,13 @@
         .badge-maternity { background: var(--badge-maternity-bg); color: var(--badge-maternity-text); border: 1px solid var(--badge-maternity-border); }
         
         .badge-dept { display: inline-block; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; min-width: 58px; text-align: center; }
+td.cell-action-dept { min-width: 170px; white-space: nowrap; }
         .dept-sok { background: #f6f0fd; color: #8e44ad; border: 1px solid #e8daf5; }
         .dept-swv { background: #eef7fc; color: #3b9cd9; border: 1px solid #c2e1f5; }
         .dept-swp { background: #eaf8f0; color: #2ebd6e; border: 1px solid #bcead0; }
         .dept-swl { background: #fffcf0; color: #cca010; border: 1px solid #fef0b3; }
         .dept-sst { background: #fff5eb; color: #e67e22; border: 1px solid #fde3cd; }
+        .dept-nhh { background: #eef0fd; color: #5b6fce; border: 1px solid #d7dbfa; }
         
         .action-link { background: none; border: none; color: var(--color-primary); font-size: 13px; font-weight: 600; cursor: pointer; margin-right: 8px; }
         .action-link:hover { color: var(--color-primary-deep); text-decoration: underline; }
@@ -880,6 +882,7 @@
                         <option value="สวป">สวป.</option>
                         <option value="สวล">สวล.</option>
                         <option value="สสท">สสท.</option>
+                        <option value="หน้าห้อง ผอ. สวพ">หน้าห้อง ผอ. สวพ</option>
                     </select>
                 </div>
                 <div class="form-group span-2">
@@ -979,7 +982,7 @@
                             <th style="width: 120px;">ประเภทลา</th>
                             <th>ช่วงระยะเวลาวันลา</th>
                             <th style="width: 95px;">จำนวนวัน</th>
-                            <th style="width: 85px;">หน่วยงาน</th>
+                            <th style="width: 170px; min-width: 170px;">หน่วยงาน</th>
                             <th>หมายเหตุ</th>
                             <th style="text-align:right; width: 160px;">การจัดการระบบ</th>
                         </tr>
@@ -1056,7 +1059,7 @@
                             <th style="width: 120px;">ประเภทลา</th>
                             <th>ช่วงระยะเวลาวันลา</th>
                             <th style="width: 95px;">จำนวนวัน</th>
-                            <th style="width: 85px;">หน่วยงาน</th>
+                            <th style="width: 170px; min-width: 170px;">หน่วยงาน</th>
                             <th>หมายเหตุ</th>
                             <th style="text-align:right; width: 160px;">การจัดการระบบ</th>
                         </tr>
@@ -1935,7 +1938,7 @@
         document.getElementById('print-end-date-text').value = '';
     }
     function getBadgeClass(type) { return type === 'ลาป่วย' ? 'badge-sick' : type === 'ลากิจ' ? 'badge-personal' : type === 'ลาคลอดบุตร' ? 'badge-maternity' : type === 'ลาพักผ่อน' ? 'badge-vacation' : 'badge-cancel'; }
-    function getDeptClass(dept) { return dept === 'สอก' ? 'dept-sok' : dept === 'สวว' ? 'dept-swv' : dept === 'สวป' ? 'dept-swp' : dept === 'สวล' ? 'dept-swl' : 'dept-sst'; }
+    function getDeptClass(dept) { return dept === 'สอก' ? 'dept-sok' : dept === 'สวว' ? 'dept-swv' : dept === 'สวป' ? 'dept-swp' : dept === 'สวล' ? 'dept-swl' : dept === 'สสท' ? 'dept-sst' : 'dept-nhh'; }
     function formatThaiDate(dateStr) { if (!dateStr) return '-'; const d = new Date(dateStr); if (isNaN(d.getTime())) return dateStr; return d.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: '2-digit' }); }
 
     const DATE_FIELD_IDS = ['input-doc-date', 'input-start-date', 'input-end-date', 'filter-date-start-general', 'filter-date-end-general', 'filter-date-start-vacation', 'filter-date-end-vacation', 'print-start-date', 'print-end-date'];
