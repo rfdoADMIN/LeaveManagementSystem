@@ -2098,15 +2098,16 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
                 @page Section1 {
                     size: 29.7cm 21cm;
                     mso-page-orientation: landscape;
-                    margin: 1.3cm 1.5cm 1.6cm 1.5cm;
-                    mso-header-margin: .3cm;
+                    margin: 0.5cm 1cm 0.5cm 1cm;
+                    mso-header-margin: .2cm;
                     mso-header: h1;
                 }
                 div.Section1 { page: Section1; }
-                body { font-family:'TH SarabunPSK', sans-serif; font-size:14pt; }
-                table.report-table { width:100%; border-collapse:collapse; }
-                table.report-table th, table.report-table td { border:1px solid #000; padding:5px; font-size:13pt; }
-                table.report-table th { background-color:#f2f2f2; }
+                body { font-family:'TH SarabunPSK', sans-serif; font-size:17.5pt; line-height:1.05; margin:0; }
+                table.report-table { width:774pt; border-collapse:collapse; table-layout:fixed; margin-top:2pt; }
+                table.report-table th, table.report-table td { border:1px solid #000; padding:0.5pt 3pt; font-size:17.5pt; line-height:1.05; word-wrap:break-word; overflow-wrap:break-word; mso-line-height-rule:exactly; }
+                table.report-table th { background-color:#f2f2f2; padding:0.5pt 3pt; }
+                table.report-table tbody tr { page-break-inside:avoid; }
                 table.header-table, table.header-table td, table.header-table tr { border:none; }
             </style>
             </head>
@@ -2115,12 +2116,23 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
 
                 <div class="Section1">
                     <table class="report-table">
+                        <colgroup>
+                            <col style="width:39pt;">
+                            <col style="width:62pt;">
+                            <col style="width:93pt;">
+                            <col style="width:70pt;">
+                            <col style="width:70pt;">
+                            <col style="width:93pt;">
+                            <col style="width:39pt;">
+                            <col style="width:62pt;">
+                            <col style="width:246pt;">
+                        </colgroup>
                         <thead>
                             <tr>
-                                <th colspan="5" style="text-align:left; font-weight:bold; font-size:16pt; background-color:#ffffff; border:none;">ทะเบียนรับใบลา</th>
-                                <th colspan="4" style="text-align:right; font-weight:normal; font-size:14pt; background-color:#ffffff; border:none;">พิมพ์เมื่อ ${printedAt}</th>
+                                <th colspan="5" style="text-align:left; font-weight:bold; font-size:17pt; background-color:#ffffff; border:none; padding:0.5pt 3pt;">ทะเบียนรับใบลา</th>
+                                <th colspan="4" style="text-align:right; font-weight:normal; font-size:14pt; background-color:#ffffff; border:none; padding:0.5pt 3pt;">พิมพ์เมื่อ ${printedAt}</th>
                             </tr>
-                            <tr><th colspan="9" style="text-align:center; font-size:15pt; background-color:#ffffff; border:none;">${filePrefix}</th></tr>
+                            <tr><th colspan="9" style="text-align:center; font-size:16pt; background-color:#ffffff; border:none; padding:0.5pt 3pt;">${filePrefix}</th></tr>
                             <tr><th>เลขทะเบียน</th><th>ลงวันที่</th><th>จาก</th><th>ถึง</th><th>ประเภทการลา</th><th>ลาวันที่</th><th>จำนวนวัน</th><th>การปฏิบัติ</th><th>หมายเหตุ</th></tr>
                         </thead>
                         <tbody>${rowsHtml}</tbody>
