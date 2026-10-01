@@ -1132,8 +1132,24 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
 </div>
 
 <script>
-    const SUPABASE_URL = 'https://rxqfmhrxoepjdsmmnqhk.supabase.co';
-    const SUPABASE_KEY_VALUE = "sb_publishable_lMMLp3mTrIiSm1Om-HdQxw_oOrHub8g"; 
+    const GAS_WEB_APP_URL ='https://script.google.com/macros/s/AKfycbwDu4x9EORKr98Ja_YFlvqjJjBPqTX7ywE6uFRDl02RFP6YcHwAFmkha3tYB32orklboA/exec';
+
+    // ---------- Google Sheet (Apps Script) API ----------
+    async function gasGet(action) {
+        const res = await fetch(`${GAS_WEB_APP_URL}?action=${encodeURIComponent(action)}&_=${Date.now()}`, { method: "GET", redirect: "follow" });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+    }
+    async function gasPost(body) {
+        // ใช้ text/plain เพื่อไม่ให้เบราว์เซอร์ส่ง preflight (Apps Script ไม่รองรับ OPTIONS)
+        const res = await fetch(GAS_WEB_APP_URL, {
+            method: "POST", redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+    }
     let currentActiveSheet = 'general';
     let globalLeaveRecords = [];
     let globalEditLogs = [];
@@ -1270,7 +1286,7 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
         initHistoryTooltipDelegation();
         initDateFields();
         switchSheet('general');
-        await fetchAllDataFromSupabase();
+        await fetchAllData();
     };
 
     function handleLogoutRedirect() {
@@ -1280,41 +1296,29 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
         }
     }
 
-    async function fetchAllDataFromSupabase() {
+    async function fetchAllData() {
         try {
-            const resRecords = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?order=created_at.desc,reg_num.desc`, {
-                method: "GET", headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}` }
-            });
-            if (resRecords.ok) globalLeaveRecords = await resRecords.json();
-
-            const resEditLogs = await fetch(`${SUPABASE_URL}/rest/v1/leave_edit_logs?order=edited_at.desc`, {
-                method: "GET", headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}` }
-            });
-            if (resEditLogs.ok) globalEditLogs = await resEditLogs.json();
-
-            await fetchDeleteLogs();
-
+            const data = await gasGet('get_all');
+            if (!data || !Array.isArray(data.records)) throw new Error((data && data.error) || 'รูปแบบข้อมูลไม่ถูกต้อง');
+            globalLeaveRecords = data.records || [];
+            globalEditLogs = data.editLogs || [];
+            globalDeleteLogs = data.deleteLogs || [];
+            renderDeleteLogs();
             populateYearSelector();
             renderTableData();
             updateStatCards();
             calculateNextRegNumbers();
         } catch (error) {
             console.error(error);
+            alert('ไม่สามารถโหลดข้อมูลจาก Google Sheet ได้: ' + error.message);
         }
     }
 
     async function fetchDeleteLogs() {
         try {
-            const resDeleteLogs = await fetch(`${SUPABASE_URL}/rest/v1/leave_delete_logs?order=deleted_at.desc`, {
-                method: "GET", headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}` }
-            });
-            if (resDeleteLogs.ok) {
-                globalDeleteLogs = await resDeleteLogs.json();
-                renderDeleteLogs();
-            }
-        } catch (error) {
-            console.error(error);
-        }
+            const data = await gasGet('get_all');
+            if (data && data.deleteLogs) { globalDeleteLogs = data.deleteLogs || []; renderDeleteLogs(); }
+        } catch (error) { console.error(error); }
     }
 
     function calculateNextRegNumbers() {
@@ -1669,56 +1673,34 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
         payload.created_by = currentUser;
     }
 
+    const btnSubmit = document.getElementById('btn-submit-main');
+    const btnOldText = btnSubmit.innerText;
+    btnSubmit.disabled = true; btnSubmit.innerText = 'กำลังบันทึก...';
     try {
-        let response;
-        if (editId) {
-            // โหมดแก้ไขรายการเดิม (PATCH)
-            response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?id=eq.${editId}`, {
-                method: "PATCH",
-                headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-        } else {
-            // โหมดสร้างรายการใหม่ (POST) - Database จะแจกเลขทะเบียนให้อัตโนมัติ
-            response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records`, {
-                method: "POST",
-                headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
+        const body = { action: 'save_record', edit_id: editId || '', payload: payload };
+        if (editId && oldRecordSnapshot) {
+            body.log = {
+                record_id: editId,
+                edited_by: currentUser,
+                edit_version: globalEditLogs.filter(l => l.record_id === editId).length + 1,
+                change_details: buildEditChangeDetails(oldRecordSnapshot, payload)
+            };
         }
+        const result = await gasPost(body);
 
-        if (response.ok) { 
-            if (editId && oldRecordSnapshot) {
-                try {
-                    const existingVersions = globalEditLogs.filter(l => l.record_id === editId).length;
-                    await fetch(`${SUPABASE_URL}/rest/v1/leave_edit_logs`, {
-                        method: "POST",
-                        headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            record_id: editId,
-                            edited_by: currentUser,
-                            edit_version: existingVersions + 1,
-                            change_details: buildEditChangeDetails(oldRecordSnapshot, payload)
-                        })
-                    });
-                } catch (logError) {
-                    console.error('บันทึกประวัติการแก้ไขไม่สำเร็จ:', logError);
-                }
-            }
+        if (result && result.status === 'success') {
             alert('บันทึกข้อมูลเรียบร้อยแล้ว!');
-            exitEditMode(); 
-            await fetchAllDataFromSupabase(); 
-        } else { 
-            const errorResult = await response.json();
-            if (errorResult.code === '23505') {
-                alert('⚠️ เลขทะเบียนนี้ถูกผู้อื่นใช้งานไปแล้ว ระบบดึงข้อมูลใหม่ให้แล้ว กรุณากดบันทึกอีกครั้ง');
-                await fetchAllDataFromSupabase();
-            } else {
-                alert('ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง'); 
-            }
+            exitEditMode();
+            await fetchAllData();
+        } else {
+            alert('ไม่สามารถบันทึกข้อมูลได้: ' + ((result && result.error) || 'กรุณาลองใหม่อีกครั้ง'));
         }
-    } catch (error) { 
-        console.error(error); 
+    } catch (error) {
+        console.error(error);
+        alert('เชื่อมต่อ Google Sheet ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+    } finally {
+        btnSubmit.disabled = false;
+        if (btnSubmit.innerText === 'กำลังบันทึก...') btnSubmit.innerText = document.getElementById('active-edit-row-id').value ? 'อัปเดตข้อมูลเก่า' : btnOldText;
     }
 }
 
@@ -1769,28 +1751,14 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
         const currentUser = localStorage.getItem('loggedInUser') || "ผู้ดูแลระบบ";
 
         try {
-            const resLog = await fetch(`${SUPABASE_URL}/rest/v1/leave_delete_logs`, {
-                method: "POST",
-                headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}`, "Content-Type": "application/json", "Prefer": "return=representation" },
-                body: JSON.stringify({ reg_num: record.reg_num, emp_name: record.emp_name, leave_type: record.leave_type, sheet_type: record.sheet_type, deleted_by: currentUser })
+            const result = await gasPost({
+                action: 'delete_record', id: id,
+                log: { reg_num: record.reg_num, emp_name: record.emp_name, leave_type: record.leave_type, sheet_type: record.sheet_type, deleted_by: currentUser }
             });
-
-            if (!resLog.ok) {
-                const errText = await resLog.text();
-                console.error('บันทึกประวัติการลบไม่สำเร็จ:', errText);
-                alert('ไม่สามารถบันทึกประวัติการลบได้ ระบบจึงยกเลิกการลบรายการนี้ไว้ก่อน เพื่อไม่ให้ประวัติการลบขาดหาย\n\nรายละเอียดข้อผิดพลาด: ' + errText);
-                return;
-            }
-
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/leave_records?id=eq.${id}`, {
-                method: "DELETE", headers: { "apikey": SUPABASE_KEY_VALUE, "Authorization": `Bearer ${SUPABASE_KEY_VALUE}` }
-            });
-
-            if (response.ok) {
+            if (result && result.status === 'success') {
                 if (document.getElementById('active-edit-row-id').value === id) exitEditMode();
-                await fetchDeleteLogs();
-                await fetchAllDataFromSupabase();
-            } else { alert('ไม่สามารถลบข้อมูลได้'); }
+                await fetchAllData();
+            } else { alert('ไม่สามารถลบข้อมูลได้: ' + ((result && result.error) || '')); }
         } catch (error) { console.error(error); alert('เกิดข้อผิดพลาดในการลบข้อมูล: ' + error.message); }
     }
 
