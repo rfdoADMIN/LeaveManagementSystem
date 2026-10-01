@@ -1155,16 +1155,29 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
     let globalEditLogs = [];
     let globalDeleteLogs = [];
 
+    function toThaiDateStr(v) {
+        const d = new Date(v);
+        if (isNaN(d.getTime())) return null;
+        return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+    }
     function getFiscalYear(dateStr) {
         if (!dateStr) return null;
-        const d = new Date(dateStr);
-        if (isNaN(d.getTime())) return null;
-        const y = d.getFullYear();
-        const m = d.getMonth() + 1;
+        const m0 = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(dateStr));
+        let y, m;
+        if (m0) { y = parseInt(m0[1]); m = parseInt(m0[2]); }
+        else {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return null;
+            y = d.getFullYear(); m = d.getMonth() + 1;
+        }
         return (m >= 10) ? y + 1 : y;
     }
+    function getRecordFiscalYear(r) {
+        const entry = r.created_at ? toThaiDateStr(r.created_at) : null;
+        return getFiscalYear(entry || r.doc_date);
+    }
     function toBuddhistYear(y) { return y + 543; }
-    function getCurrentFiscalYear() { return getFiscalYear(new Date().toISOString().slice(0, 10)); }
+    function getCurrentFiscalYear() { return getFiscalYear(toThaiDateStr(new Date())); }
 
     let selectedFiscalYear = getCurrentFiscalYear();
 
@@ -1179,10 +1192,11 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
     function populateYearSelector() {
         const yearsSet = new Set();
         globalLeaveRecords.forEach(r => {
-            const fy = getFiscalYear(r.doc_date);
+            const fy = getRecordFiscalYear(r);
             if (fy) yearsSet.add(fy);
         });
-        yearsSet.add(getCurrentFiscalYear());
+        const curFy = getCurrentFiscalYear();
+        for (let y = curFy - 1; y <= curFy; y++) yearsSet.add(y); // แสดงย้อนหลัง 5 ปีเสมอ แม้ยังไม่มีข้อมูล
         yearsSet.add(selectedFiscalYear);
 
         const years = [...yearsSet].sort((a, b) => b - a);
@@ -1300,7 +1314,7 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
         try {
             const data = await gasGet('get_all');
             if (!data || !Array.isArray(data.records)) throw new Error((data && data.error) || 'รูปแบบข้อมูลไม่ถูกต้อง');
-            globalLeaveRecords = data.records || [];
+            globalLeaveRecords = (data.records || []).map(r => ({ ...r, reg_num: Number(r.reg_num), total_days: Number(r.total_days) }));
             globalEditLogs = data.editLogs || [];
             globalDeleteLogs = data.deleteLogs || [];
             renderDeleteLogs();
@@ -1324,7 +1338,7 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
     function calculateNextRegNumbers() {
         let maxGen = 0, maxVac = 0;
         globalLeaveRecords.forEach(r => {
-            if (getFiscalYear(r.doc_date) !== selectedFiscalYear) return;
+            if (getRecordFiscalYear(r) !== selectedFiscalYear) return;
             if (r.sheet_type === 'general' && r.reg_num > maxGen) maxGen = r.reg_num;
             if (r.sheet_type === 'vacation' && r.reg_num > maxVac) maxVac = r.reg_num;
         });
@@ -1372,7 +1386,7 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
         const f = tableFilters[sheetType];
         return globalLeaveRecords.filter(r => {
             if (r.sheet_type !== sheetType) return false;
-            if (getFiscalYear(r.doc_date) !== selectedFiscalYear) return false;
+            if (getRecordFiscalYear(r) !== selectedFiscalYear) return false;
             if (f.search) {
                 if (!String(r.reg_num).includes(f.search)) return false;
             }
@@ -1781,7 +1795,7 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
         const errorMsg = document.getElementById('reg-error-msg');
         const val = parseInt(regInput.value);
         if (!val) return false;
-        const isDup = globalLeaveRecords.some(r => r.reg_num === val && r.sheet_type === currentActiveSheet && r.id !== editId && getFiscalYear(r.doc_date) === selectedFiscalYear);
+        const isDup = globalLeaveRecords.some(r => r.reg_num === val && r.sheet_type === currentActiveSheet && r.id !== editId && getRecordFiscalYear(r) === selectedFiscalYear);
         if (isDup) {
             regInput.classList.add('duplicate-error'); errorMsg.style.display = 'block'; return true;
         } else {
@@ -1815,7 +1829,7 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
 
     function updateStatCards() {
         if (currentActiveSheet === 'general') {
-            const genRecords = globalLeaveRecords.filter(r => r.sheet_type === 'general' && getFiscalYear(r.doc_date) === selectedFiscalYear);
+            const genRecords = globalLeaveRecords.filter(r => r.sheet_type === 'general' && getRecordFiscalYear(r) === selectedFiscalYear);
             let sick = 0, personal = 0, cancel = 0;
             genRecords.forEach(r => {
                 if (r.leave_type === 'ลาป่วย') sick++;
@@ -1827,7 +1841,7 @@ td.cell-action-dept { min-width: 170px; white-space: nowrap; }
             document.getElementById('stat-personal').innerText = personal;
             document.getElementById('stat-cancel').innerText = cancel;
         } else {
-            const vacRecords = globalLeaveRecords.filter(r => r.sheet_type === 'vacation' && getFiscalYear(r.doc_date) === selectedFiscalYear);
+            const vacRecords = globalLeaveRecords.filter(r => r.sheet_type === 'vacation' && getRecordFiscalYear(r) === selectedFiscalYear);
             document.getElementById('stat-vacation-total').innerText = vacRecords.length;
         }
     }
